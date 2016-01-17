@@ -110,6 +110,10 @@ footer {
   margin: 1.5rem 0;
 }
 
+iframe {
+  display: none;
+}
+
 /* Mobile/responsive stuff... */
 
 @media screen and (max-width: 400px)
@@ -125,5 +129,4 @@ footer {
     line-height: 1;
     line-height: 3rem;
   }
-
 }
