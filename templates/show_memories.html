@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
   <form action="{{ url_for('add_memory') }}" method=post>
-    <input type=text name=memory>
+    <input type="text" name="memory" autofocus>
   </form>
 
   <ol>
