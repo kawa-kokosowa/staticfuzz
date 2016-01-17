@@ -96,6 +96,11 @@ def add_memory():
 
     """
 
+    # if memory is longer than MAX_CHARACTERS
+    # then we send a bad request
+    if len(request.form['memory']) > app.config['MAX_CHARACTERS']:
+        abort(400)
+
     g.db.execute('''
                  DELETE FROM memories
                  WHERE id NOT IN
