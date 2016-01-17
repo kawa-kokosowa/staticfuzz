@@ -1,9 +1,10 @@
 # staticfuzz
 http://staticfuzz.com/
 
-I have ten memories of anonymous people.
+I'll tell you ten memories of anonymous people, from oldest
+to newest. When we make a new memory, I forget the oldest
+to make room.
 
-If I make a new memory, I forget the eleventh oldest.
 
 ## Running
 
