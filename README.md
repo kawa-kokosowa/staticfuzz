@@ -1,4 +1,4 @@
-# Static Fuzz
+# staticfuzz
 
 I have ten memories of anonymous people.
 
