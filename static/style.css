@@ -99,6 +99,7 @@ input[type=text] {
   color: #d0ddd2;
   border: none;
   outline: none;
+  text-align: center;
 }
 
 footer {
