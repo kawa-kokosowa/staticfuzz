@@ -24,11 +24,13 @@ html, body {
   min-height: 100%;
   overflow: auto;
   text-align: center;
+  max-width: 100vw;
+  word-break: break-all;
 }
 
 body {
   font: 400 200%/1.5 'Averia Sans Libre';
-  background: rgba(33, 33, 33, 0.95);
+  background: rgba(33, 33, 33, 0.92);
   color: #d0ddd2;
   padding: 0 60px;
 }
@@ -79,7 +81,6 @@ ol > li:before {
 
 li {
   color: #d0ddd2;
-  word-break: break-all;
 }
 
 li + li {
@@ -100,6 +101,7 @@ input[type=text] {
   border: none;
   outline: none;
   text-align: center;
+  width: 100%;
 }
 
 footer {
@@ -108,5 +110,20 @@ footer {
   margin: 1.5rem 0;
 }
 
-/* glitch effect */
+/* Mobile/responsive stuff... */
 
+@media screen and (max-width: 400px)
+{
+
+  h1, header {
+    margin-top: 0;
+    padding-top: 0;
+    line-height: 1.5rem;
+  }
+
+  h1 {
+    line-height: 1;
+    line-height: 3rem;
+  }
+
+}
