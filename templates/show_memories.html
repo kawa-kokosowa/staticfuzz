@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+  <form action="{{ url_for('add_memory') }}" method=post>
+    <input type=text name=memory>
+  </form>
+
+  <ol>
+    {% for memory in memories %}
+      <li>{{ memory.memory }}
+        {% if session.logged_in %}
+          <form action="{{ url_for('forget') }}" method=post>
+            <input type="hidden" name="id" value={{ memory.id }}>
+            <input type="submit" value="Forget">
+          </form>
+        {% endif %}
+	{% else %}
+      <li><em>I shouldn't exist.</em>
+	{% endfor %}
+  </ol>
+{% endblock %}

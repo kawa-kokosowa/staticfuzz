@@ -1,0 +1,96 @@
+/* Grey: #d0ddd2
+ * Yellow: #fff430
+ * Magenta: #e82b7a
+ * Green: 8fe81f
+ * Black: #212121
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700,700italic,400italic);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: url('bg-green.gif') no-repeat center center fixed #000;
+  background-size: cover;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: auto;
+}
+
+body {
+  font: 400 100%/1.625 'Averia Sans Libre';
+  background: rgba(33, 33, 33, 0.95);
+  color: #d0ddd2;
+  padding: 0 60px;
+}
+
+header {
+  padding: 1.625rem 0;  
+  color: #e82b7a;
+  font-weight: 700;
+}
+
+h1, h2 {
+  color: #fff430;
+}
+
+h1 {
+  font-size: 261.79%; 
+  line-height: 3.25rem;
+}
+
+h1 a:link,
+h1 a:visited {
+  color: #fff430;
+  text-decoration: none;
+}
+
+h2 {
+  font-size: 138.2%;
+  line-height: 1.625rem;
+}
+
+ol {
+  list-style-type: none;
+  counter-reset: item 11;
+  margin: 1.625rem 20px;
+}
+
+ol > li {
+  counter-increment: item -1;
+}
+
+ol > li:before {
+  content: counter(item) ". ";
+  color: #e82b7a;
+  float: left;
+  padding-right: 10px;
+  font-weight: 700;
+}
+
+li {
+  color: #d0ddd2;
+}
+
+li + li {
+  margin-top: 1.625rem;
+}
+
+a:link,
+a:visited {
+  color: #8fe81f
+}
+
+footer {
+  display: inline-block;
+  font-size: 61.8%;
+  margin: 1.626rem 0;
+}

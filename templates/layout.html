@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>S T A T I C F U Z Z</title>
+      <meta charset="UTF-8">
+      <meta name=viewport content="width=device-width, initial-scale=1">
+      <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+      <header>
+        <h1><a href="/">STATICFUZZ</a></h1>
+        <p>Here for a blink of an eye.</p>
+      </header>
+      <main>
+ 	    {% for message in get_flashed_messages() %}
+		  {{ message }}
+	    {% endfor %}
+	    {% block body %}{% endblock %}
+      </main>
+      <footer>
+        Nothing here is remembered by us.
+        {% if not session.logged_in %}
+			<a href="{{ url_for('login') }}">god?</a>
+		{% else %}
+			<a href="{{ url_for('logout') }}">goodbye</a>
+		{% endif %}
+      </footer>
+    </body>
+</html>
