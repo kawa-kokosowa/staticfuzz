@@ -78,6 +78,7 @@ ol > li:before {
 
 li {
   color: #d0ddd2;
+  word-break: break-all;
 }
 
 li + li {
