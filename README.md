@@ -11,7 +11,7 @@ available via http://staticfuzz.com/.
 ## Running
 
   1. `pip install -r requirements.txt`
-  2. `sqlite3 staticfuzz.db < schema.sql`
+  2. `sqlite3 /tmp/staticfuzz.db < schema.sql`
   3. `python main.py`
 
 God is `lain` and password is `bear`.
