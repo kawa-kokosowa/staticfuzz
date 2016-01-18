@@ -2,6 +2,12 @@ DATABASE = '/tmp/staticfuzz.db'
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
+# Client poll/refresh rate in ms
+REFRESH = 3000
+
+# Timeout in ms
+TIMEOUT = 30000
+
 # God/admin
 USERNAME = 'lain'
 PASSWORD = 'bear'

@@ -12,7 +12,7 @@
                   url: "{{ url_for('list_memories') }}",
                   dataType: 'json',
                   cache: true,
-                  timeout: 30000,
+                  timeout: {{ config.TIMEOUT }},
                   success: function(data) {
                       $('#memories').empty();
                       $.each(data, function(i, data){ 
@@ -24,18 +24,16 @@
                               $('#memories').append('</form>');
                           {% endif %}
                           $('#memories').append('</li>');
-                          //setTimeout(repeatMe, 5000);
                       });
                   },
                   error: function(){
                       $('#memories').empty();
                       $('#memories').append('<li>Error');
-                      //setTimeout(repeatMe, 5000);
                   }
               });
           }
           
-          setInterval(repeatMe, 5000);
+          setInterval(repeatMe, {{ config.REFRESH }});
       </script>
     </head>
     <body>
