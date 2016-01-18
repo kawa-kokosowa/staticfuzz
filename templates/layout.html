@@ -42,7 +42,12 @@
                               {% endif %} 
 
                               $("#memories li:first-child").remove();
-                              $('#memories').append('<li id=' + memory.id + '>' + memory.memory);
+
+                              var new_li = jQuery('<li />');
+                              new_li.attr('id', memory.id);
+                              new_li.text(memory.memory)
+
+                              $('#memories').append(new_li);
                               console.log(memory.id);
 
                               {% if session.logged_in %}
