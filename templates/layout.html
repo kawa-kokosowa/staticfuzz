@@ -12,7 +12,7 @@
                   url: "{{ url_for('list_memories') }}",
                   dataType: 'json',
                   cache: true,
-                  timeout: {{ config.TIMEOUT }},
+                  timeout: "{{ config.TIMEOUT }}",
                   success: function(data) {
                       $('#memories').empty();
                       $.each(data, function(i, data){ 
