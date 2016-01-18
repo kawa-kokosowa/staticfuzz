@@ -107,6 +107,10 @@ def add_memory():
 
     """
 
+    if len(request.form['memory']) == 0:
+        
+        return redirect(url_for('show_memories'))
+
     # if memory is longer than MAX_CHARACTERS
     # then we send a bad request
     if len(request.form['memory']) > app.config['MAX_CHARACTERS']:
