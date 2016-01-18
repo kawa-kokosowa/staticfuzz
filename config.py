@@ -3,7 +3,7 @@ DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
 # Client poll/refresh rate in ms
-REFRESH = 3000
+REFRESH = 1000
 
 # Timeout in ms
 TIMEOUT = 30000
