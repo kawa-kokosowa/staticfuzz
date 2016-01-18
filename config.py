@@ -18,3 +18,7 @@ MAX_CHARACTERS = 140
 # If this is enabled an HTML audio player will
 # appear in the footer and loop an MP3.
 # BACKGROUND_MP3 = '/static/background.mp3'
+
+# If this is enabled the specified MP3 is used
+# as a notification for new messages.
+NOTIFICATION_SOUND = '/static/notification.ogg'
