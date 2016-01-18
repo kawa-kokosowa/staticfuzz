@@ -114,6 +114,15 @@ input[type=text] {
   max-width: 100%;
 }
 
+ol li form {
+  display: inline-block;
+}
+
+ol li form input[type=submit] {
+  font: 400 100%/1.625 'Averia Sans Libre';
+  border: none;
+}
+
 footer {
   display: inline-block;
   font-size: 61.8%;

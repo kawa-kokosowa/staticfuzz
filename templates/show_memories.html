@@ -5,7 +5,7 @@
            maxlength="{{ config.MAX_CHARACTERS }}" autofocus>
   </form>
 
-  <ol>
+  <ol id="memories">
     {% for memory in memories %}
       <li>{{ memory.memory }}
         {% if session.logged_in %}

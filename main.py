@@ -1,4 +1,6 @@
+import json
 import sqlite3
+
 from flask import *
 from contextlib import closing
 
@@ -41,13 +43,22 @@ def teardown_request(exception):
         db.close()
 
 
+@app.route('/list_memories')
+def list_memories():
+
+    cur = g.db.execute('SELECT id, memory FROM memories ORDER BY id ASC')
+    memories = [{'id': row[0], 'memory': row[1]} for row in cur.fetchall()]
+
+    return json.dumps(memories)
+
+
 @app.route('/')
 def show_memories():
     """Show the memories.
 
     """
 
-    cur = g.db.execute('select id, memory from memories order by id asc')
+    cur = g.db.execute('SELECT id, memory FROM memories ORDER BY id ASC')
     memories = [dict(id=row[0], memory=row[1]) for row in cur.fetchall()]
 
     return render_template('show_memories.html', memories=memories)
