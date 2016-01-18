@@ -31,26 +31,10 @@ html, body {
 
 body {
   font: 400 200%/1.5 'Averia Sans Libre';
-  background: rgba(33, 33, 33, 0.93);
+  background: rgba(33, 33, 33, 0.95);
   color: #d0ddd2;
   padding: 0 60px;
 }
-
-body:before {
-  content: "";
-  display: block;
-  width: 200vw;
-  height: 200vh;
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  background: url(cloth.gif) center center;
-  background-size: cover;
-  z-index: -99999;
-  animation: spin 60s linear infinite;
-}
-
-@keyframes spin { 100% { transform:rotate(360deg); } }
 
 header {
   padding: 1.5rem 0;  
@@ -105,7 +89,7 @@ li:before {
   display: inline-block;
   background: url(bullet.gif) 0 0 repeat;
   background-size: cover;
-  transform: rotate(30deg);
+  transform: rotate(280deg);
 }
 
 li + li {

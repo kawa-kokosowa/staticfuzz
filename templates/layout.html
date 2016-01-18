@@ -50,16 +50,23 @@
 	    {% block body %}{% endblock %}
       </main>
       <footer>
-        Nothing here is remembered by us.
+        <p>Nothing here is remembered by us.</p>
         
-        The <a href="https://github.com/hypatia-software-org/staticfuzz">
+        <p>The <a href="https://github.com/hypatia-software-org/staticfuzz">
         staticfuzz GitHub repository</a> is maintained by
-        <a href="http://hypatia.software">Hypatia Software Organization</a>.
+        <a href="http://hypatia.software">Hypatia Software Organization</a>.</p>
+
+        {% if config.BACKGROUND_MP3 %}
+          <audio controls>
+            <source src="{{ config.BACKGROUND_MP3 }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        {% endif %}
 
         {% if not session.logged_in %}
-			<a href="{{ url_for('login') }}">god?</a>
+          <p><a href="{{ url_for('login') }}">god?</a></p>
 		{% else %}
-			<a href="{{ url_for('logout') }}">goodbye</a>
+          <p><a href="{{ url_for('logout') }}">goodbye</a></p>
 		{% endif %}
       </footer>
     </body>
