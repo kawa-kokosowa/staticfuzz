@@ -79,28 +79,17 @@ ol > li:before {
 
 li {
   color: #d0ddd2;
+  background: url(cloth.gif) 0 0 repeat;
+  background-size: cover;
 }
 
 li:before {
   content: "";
   position: relative;
   display: inline-block;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
+  z-index: 0;
   background: url(bullet.gif) 0 0 repeat;
-  transform: rotate(30deg);
-}
-
-li:after {
-  content: "";
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 50%;
-  left: 50%;
-  z-index: -1;
-  background: url(glitch.gif) 0 0 repeat;
+  background-size: cover;
   transform: rotate(30deg);
 }
 
