@@ -42,9 +42,6 @@
         <p>Here for a blink of an eye.</p>
       </header>
       <main>
- 	    {% for message in get_flashed_messages() %}
-		  {{ message }}
-	    {% endfor %}
 	    {% block body %}{% endblock %}
       </main>
       <footer>
