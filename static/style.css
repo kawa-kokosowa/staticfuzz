@@ -83,6 +83,42 @@ li {
   color: #d0ddd2;
 }
 
+li:nth-child(1) {
+  opacity: 0.10;
+}
+
+li:nth-child(2) {
+  opacity: 0.20;
+}
+
+li:nth-child(3) {
+  opacity: 0.30;
+}
+
+li:nth-child(4) {
+  opacity: 0.40;
+}
+
+li:nth-child(5) {
+  opacity: 0.50;
+}
+
+li:nth-child(6) {
+  opacity: 0.60;
+}
+
+li:nth-child(7) {
+  opacity: 0.70;
+}
+
+li:nth-child(8) {
+  opacity: 0.80;
+}
+
+li:nth-child(9) {
+  opacity: 0.90;
+}
+
 li:before {
   content: "";
   position: relative;
