@@ -16,7 +16,7 @@
   </ol>
 
   {% for message in get_flashed_messages() %}
-    <p>{{ message }}</p>
+    <p id="flash">{{ message }}</p>
   {% endfor %}
 
   <form action="{{ url_for('add_memory') }}" method=post>

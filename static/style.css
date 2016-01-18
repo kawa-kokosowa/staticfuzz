@@ -168,6 +168,12 @@ iframe {
   display: none;
 }
 
+#flash {
+  color: #fff430;
+  font-size: 61.8%;
+  margin: 1.5rem 0;
+}
+
 /* Mobile/responsive stuff... */
 
 @media screen and (max-width: 400px)
