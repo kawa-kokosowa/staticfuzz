@@ -33,7 +33,6 @@
                       var largest_new_id = Math.max.apply(Math, new_ids);
 
                       var largest_old_id = parseInt($('#memories').children().last().attr('id'));
-                      console.log(largest_new_id + " > " + largest_old_id);
 
                       $.each(list_of_memories, function( index, memory ) {
                           if ( largest_new_id > largest_old_id ) {
@@ -48,7 +47,6 @@
                               new_li.text(memory.memory)
 
                               $('#memories').append(new_li);
-                              console.log(memory.id);
 
                               {% if session.logged_in %}
                                   $('#memories').append('<form action={{ url_for("forget") }} method=post>');
