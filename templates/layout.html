@@ -11,6 +11,37 @@
               var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
           {% endif %} 
 
+          // notification system
+          var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+
+          Notification.requestPermission(function (permission) {
+              // .. get permission for showing notifications
+              // console.log(permission);
+          });
+
+          function showNotification(memory) {
+              // display a notification for a new memory
+              var instance = new Notification("Staticfuzz Memory #" + memory.id, {
+                  body: memory.memory,
+                  icon: "http://staticfuzz.com/static/bg-wave.gif"
+              });
+
+              instance.onclick = function () {
+                  // Something to do
+              };
+              instance.onerror = function () {
+                  // Something to do
+              };
+              instance.onshow = function () {
+                  // Something to do
+              };
+              instance.onclose = function () {
+                  // Something to do
+              };
+
+              return false;
+          }
+
           // flaten memory to list of ids
           function onlyMemoryIds(memories) {
               var ids = [];
@@ -36,9 +67,17 @@
 
                       $.each(list_of_memories, function( index, memory ) {
                           if ( largest_new_id > largest_old_id ) {
-                              {% if config.NOTIFICATION_SOUND %}
+
+                              // make notification sound and display notification
+                              // only works after ten memories
+                              if ( $("#memories li").length <= 10 && memory.id > largest_old_id )  {
+                                  {% if config.NOTIFICATION_SOUND %}
                                   notification_sound.play();
-                              {% endif %} 
+                                  {% endif %} 
+                                  showNotification(memory);
+                              }
+
+                              // ...
 
                               $("#memories li:first-child").remove();
 
