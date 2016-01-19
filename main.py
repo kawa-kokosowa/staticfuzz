@@ -7,7 +7,7 @@ import urllib2
 import mimetypes
 
 from flask import *
-from PIL import Image
+from PIL import Image, ImageOps
 from cStringIO import StringIO
 from contextlib import closing
 
@@ -114,6 +114,11 @@ def glitch_from_url(url_string):
     # open and tweak the image
     tweaked_image = Image.open(urlopen_result_io)
     tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'], app.config['THUMB_MAX_HEIGHT']])
+
+    # random chance to invert
+    if random.randint(0, 2):
+        tweaked_image = ImageOps.invert(tweaked_image)
+
     tweaked_image = tweaked_image.convert(mode='P', palette=Image.ADAPTIVE,
                                           colors=random.randint(app.config['MIN_COLORS'],
                                                                 app.config['MAX_COLORS']))
