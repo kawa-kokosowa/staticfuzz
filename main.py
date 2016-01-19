@@ -115,6 +115,9 @@ def glitch_from_url(url_string):
     tweaked_image = Image.open(urlopen_result_io)
     tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'], app.config['THUMB_MAX_HEIGHT']])
 
+    # autocontrast
+    tweaked_image = ImageOps.invert(tweaked_image)
+
     # random chance to invert
     if random.randint(0, 2):
         tweaked_image = ImageOps.invert(tweaked_image)
