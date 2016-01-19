@@ -11,12 +11,6 @@
               var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
           {% endif %} 
 
-          function sendMemory() {
-              // Send the data using post
-              var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
-              // reset input
-              $("#diamond input").val('');
-          }
 
           // notification system
           var Notification = window.Notification || window.mozNotification || window.webkitNotification;
@@ -67,47 +61,69 @@
                   cache: true,
                   timeout: "{{ config.TIMEOUT }}",
                   success: function(list_of_memories) {
-                      var new_ids = onlyMemoryIds(list_of_memories);
-                      var largest_new_id = Math.max.apply(Math, new_ids);
+                      // We're going to determine if the newly polled list
+                      // of memories contains any new ones.
+                      //
+                      // First we start by finding the largest memory ID of
+                      // the memories polled.
+                      var largest_polled_id = 0;
 
-                      var largest_old_id = parseInt($('#memories').children().last().attr('id'));
-
-                      $.each(list_of_memories, function( index, memory ) {
-                          if ( largest_new_id > largest_old_id ) {
-
-                              // make notification sound and display notification
-                              // only works after ten memories
-                              if ( $("#memories li").length <= 10 && memory.id > largest_old_id )  {
-                                  {% if config.NOTIFICATION_SOUND %}
-                                  notification_sound.play();
-                                  {% endif %} 
-
-                                  if (! document.hasFocus()) {
-                                      showNotification(memory);
-                                  }
-                              }
-
-                              // ...
-
-                              $("#memories li:first-child").remove();
-
-                              var new_li = jQuery('<li />');
-                              new_li.attr('id', memory.id);
-                              new_li.text(memory.memory)
-
-                              $('#memories').append(new_li);
-
-                              {% if session.logged_in %}
-                                  $('#memories').append('<form action={{ url_for("forget") }} method=post>');
-                                  $('#memories').append('<input type="hidden" name="id" value='+memory.id+'>');
-                                  $('#memories').append('<input type="submit" value="Forget">');
-                                  $('#memories').append('</form>');
-                              {% endif %}
-
-                              $('#memories').append('</li>');
+                      $.each(list_of_memories, function(index, memory) {
+                          if (memory.id > largest_polled_id) {
+                              largest_polled_id = memory.id;
                           }
+
                       });
-                  },
+
+                      // ... then we find the largest memory ID on the HTML
+                      // page currently!
+                      var largest_html_id = parseInt($('#memories li:last').attr('id'));
+                      console.log($("#memories li").length);
+
+                      // If the largest ID from the polled memories is larger than the
+                      // ID from the HTML memories:
+                      if (largest_polled_id > largest_html_id) {
+
+                          // If there are already ten memories in the HTML,
+                          // remove the first <li> before we add another!
+                          if (largest_html_id == 0 | $("#memories li").length == 10) {
+                              $("#memories li:first-child").remove();
+                          }
+
+                          // Notification: pop up message if page isn't focused, optional sound
+                          {% if config.NOTIFICATION_SOUND %}
+                          notification_sound.play();
+                          {% endif %} 
+
+                          // last memory is the one with the highest id
+                          memory = list_of_memories[list_of_memories.length - 1];
+
+                          // only popup if the tab doesn't have focus
+                          if (! document.hasFocus()) {
+                              showNotification(memory);
+                          }
+                          var new_li = jQuery('<li />');
+                          new_li.attr('id', memory.id);
+                          new_li.text(memory.memory)
+
+                          $('#memories').append(new_li);
+
+                          {% if session.logged_in %}
+                              var god_delete = jQuery("<form />");
+                              god_delete.attr("action", "{{ url_for("forget") }}");
+                              god_delete.attr("method", "post");
+
+                              var hidden_id = jQuery("<input />");
+                              god_delete.attr("type", "hidden");
+                              god_delete.attr("value", "");
+                              $('#memories').append('<input type="hidden" name="id" value='+memory.id+'>');
+                              $('#memories').append('<input type="submit" value="Forget">');
+                          {% endif %}
+
+                          $('#memories').append('</li>');
+
+                      }
+                  },  // end success
                   error: function(){
                       $('#memories').empty();
                       $('#memories').append('<li>Error');
@@ -154,7 +170,10 @@
           $('#diamond').removeAttr("action");
           $("#diamond").on("submit", function (e) {
               e.preventDefault();
-              sendMemory();
+              // Send the data using post
+              var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
+              // reset input
+              $("#diamond input").val('');
           });
 
       </script>
