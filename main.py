@@ -107,13 +107,22 @@ def add_memory():
 
     """
 
-    if len(request.form['memory'].strip()) == 0:
+    memory_text = request.form['memory'].strip()
+
+    if len(memory_text) == 0:
         
+        return redirect(url_for('show_memories'))
+
+    # you cannot repost something already in the memories
+    cursor = g.db.execute("SELECT memory FROM memories")
+
+    if memory_text in [memory[0] for memory in cursor.fetchall()]:
+
         return redirect(url_for('show_memories'))
 
     # if memory is longer than MAX_CHARACTERS
     # then we send a bad request
-    if len(request.form['memory'].strip()) > app.config['MAX_CHARACTERS']:
+    if len(memory_text) > app.config['MAX_CHARACTERS']:
         abort(400)
 
     g.db.execute('''
@@ -123,7 +132,7 @@ def add_memory():
                     ORDER BY id DESC LIMIT 9)
                  ''')
     g.db.execute('insert into memories (memory) values (?)',
-                 [request.form['memory'].strip()])
+                 [memory_text])
     g.db.commit()
     flash("A memory made, another forgotten")
 
