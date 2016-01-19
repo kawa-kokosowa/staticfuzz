@@ -3,10 +3,16 @@
 
   <ol id="memories">
     {% for memory in memories %}
-      <li id="{{ memory.id }}">{{ memory.memory }}
+      <li id="{{ memory.id }}">
+
         {% if memory.image %}
-        <img src="data:image/png;base64,{{ memory.image }}" alt="{{ memory.id }}">
+        <a href="{{ memory.memory }}">
+          <img src="data:image/png;base64,{{ memory.image }}" alt="{{ memory.id }}">
+        </a>
+        {% else %}
+        {{ memory.memory}}
         {% endif %}
+
         {% if session.logged_in %}
           <form action="{{ url_for('forget') }}" method=post>
             <input type="hidden" name="id" value={{ memory.id }}>

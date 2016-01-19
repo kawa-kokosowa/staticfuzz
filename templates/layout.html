@@ -111,9 +111,15 @@
                           // this aint workin
                           if (memory.image) {
                               console.log("whoah");
+
+                              var link = jQuery('<a />');
+                              link.attr('href', memory.memory);
+
                               var image = jQuery('<img />');
                               image.attr('src', "data:image/png;base64," + memory.image);
-                              new_li.append(image);
+
+                              link.append(image);
+                              new_li.append(link);
                           }
 
                           $('#memories').append(new_li);
