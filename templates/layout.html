@@ -14,7 +14,8 @@
           function sendMemory() {
               // Send the data using post
               var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
-              console.log($("#diamond input").val());
+              // reset input
+              $("#diamond input").val('');
           }
 
           // notification system
