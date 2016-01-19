@@ -11,6 +11,12 @@
               var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
           {% endif %} 
 
+          function sendMemory() {
+              // Send the data using post
+              var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
+              console.log($("#diamond input").val());
+          }
+
           // notification system
           var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 
@@ -141,5 +147,15 @@
           <p><a href="{{ url_for('logout') }}">goodbye</a></p>
 		{% endif %}
       </footer>
+      <script>
+          // replace chat submit with ajax send
+          $('#diamond').removeAttr("method");
+          $('#diamond').removeAttr("action");
+          $("#diamond").on("submit", function (e) {
+              e.preventDefault();
+              sendMemory();
+          });
+
+      </script>
     </body>
 </html>
