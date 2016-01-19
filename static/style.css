@@ -64,17 +64,12 @@ h2 {
 
 ol {
   list-style-type: none;
-  counter-reset: item 11;
   margin: 1.5rem 20px;
   position: relative;
 }
 
-ol > li {
-  counter-increment: item -1;
-}
-
 ol > li:before {
-  content: "(" counter(item) ") ";
+  content: attr(id);
   color: #fff;
   font-weight: 700;
 }
