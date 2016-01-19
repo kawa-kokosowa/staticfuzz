@@ -62,6 +62,10 @@ h2 {
   line-height: 1.5rem;
 }
 
+#memories img {
+  background: #212121;
+}
+
 ol {
   list-style-type: none;
   margin: 1.5rem 20px;
