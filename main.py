@@ -114,9 +114,9 @@ def add_memory():
         return redirect(url_for('show_memories'))
 
     # you cannot repost something already in the memories
-    cursor = g.db.execute("SELECT memory FROM memories")
+    cursor = g.db.execute("SELECT memory FROM memories WHERE memory=?", (memory_text,))
 
-    if memory_text in [memory[0] for memory in cursor.fetchall()]:
+    if cursor.fetchall():
 
         return redirect(url_for('show_memories'))
 
