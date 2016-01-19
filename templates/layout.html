@@ -105,7 +105,6 @@
 
                           var new_li = jQuery('<li />');
                           new_li.attr('id', memory.id);
-                          new_li.text(memory.memory);
 
                           // if have image append
                           // this aint workin
@@ -118,6 +117,8 @@
 
                               link.append(image);
                               new_li.append(link);
+                          } else {
+                              new_li.text(memory.memory);
                           }
 
                           $('#memories').append(new_li);
