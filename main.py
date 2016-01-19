@@ -106,6 +106,44 @@ def logout():
     return redirect(url_for('show_memories'))
 
 
+def glitch_from_url(url_string):
+    # get the image from the net
+    urlopen_result = urllib2.urlopen(url_string)
+    urlopen_result_io = io.BytesIO(urlopen_result.read())
+
+    # open and tweak the image
+    tweaked_image = Image.open(urlopen_result_io)
+    tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'], app.config['THUMB_MAX_HEIGHT']])
+    tweaked_image = tweaked_image.convert(mode='P', palette=Image.ADAPTIVE,
+                                          colors=random.randint(app.config['MIN_COLORS'],
+                                                                app.config['MAX_COLORS']))
+
+    # save the image as base64 HTML image
+    glitch_image = StringIO()
+    tweaked_image.save(glitch_image, "PNG")
+    glitch_string = glitch_image.getvalue()
+
+    # glitch right before encoding
+    for i in range(1, random.randint(1, 5)):
+        # splice
+        start_point = random.randint(2500, len(glitch_string))
+        end_point = start_point + random.randint(0, len(glitch_string) - start_point)
+        section = glitch_string[start_point:end_point]
+
+        repeated = ''
+
+        for i in range(1, random.randint(1, 5)):
+            repeated += section
+
+    new_start_point = random.randint(2500, len(glitch_string))
+    new_end_point = new_start_point + random.randint(0, len(glitch_string) - new_start_point)
+    glitch_string = glitch_string[:new_start_point] + repeated + glitch_string[new_end_point:]
+
+    base64_string = base64.b64encode(glitch_string)
+
+    return base64_string
+
+
 @app.route('/add_memory', methods=['POST'])
 def add_memory():
     """Remember something; add a memory.
@@ -144,19 +182,7 @@ def add_memory():
     mimetype, __ = mimetypes.guess_type(memory_text)
 
     if mimetype and mimetype.startswith('image'):
-        # get the image from the net
-        urlopen_result = urllib2.urlopen(memory_text)
-        urlopen_result_io = io.BytesIO(urlopen_result.read())
-    
-        # open and tweak the image
-        tweaked_image = Image.open(urlopen_result_io)
-        tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'], app.config['THUMB_MAX_HEIGHT']])
-        tweaked_image = tweaked_image.convert(mode='P', palette=Image.ADAPTIVE, colors=random.randint(2, 10))
-    
-        # save the image as base64 HTML image
-        base64_image = StringIO()
-        tweaked_image.save(base64_image, "PNG", colors=1)
-        base64_string = base64.b64encode(base64_image.getvalue())
+        base64_string = glitch_from_url(memory_text)
     
         g.db.execute('insert into memories (memory, image) values (?, ?)',
                      [memory_text, base64_string])
