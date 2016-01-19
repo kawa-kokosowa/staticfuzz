@@ -102,9 +102,19 @@
                           if (! document.hasFocus()) {
                               showNotification(memory);
                           }
+
                           var new_li = jQuery('<li />');
                           new_li.attr('id', memory.id);
-                          new_li.text(memory.memory)
+                          new_li.text(memory.memory);
+
+                          // if have image append
+                          // this aint workin
+                          if (memory.image) {
+                              console.log("whoah");
+                              var image = jQuery('<img />');
+                              image.attr('src', "data:image/png;base64," + memory.image);
+                              new_li.append(image);
+                          }
 
                           $('#memories').append(new_li);
 

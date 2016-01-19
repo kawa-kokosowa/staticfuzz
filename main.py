@@ -1,7 +1,14 @@
+import io
 import json
+import random
+import base64
 import sqlite3
+import urllib2
+import mimetypes
 
 from flask import *
+from PIL import Image
+from cStringIO import StringIO
 from contextlib import closing
 
 
@@ -46,8 +53,8 @@ def teardown_request(exception):
 @app.route('/list_memories')
 def list_memories():
 
-    cur = g.db.execute('SELECT id, memory FROM memories ORDER BY id ASC')
-    memories = [{'id': row[0], 'memory': row[1]} for row in cur.fetchall()]
+    cur = g.db.execute('SELECT id, memory, image FROM memories ORDER BY id ASC')
+    memories = [{'id': row[0], 'memory': row[1], 'image': row[2]} for row in cur.fetchall()]
 
     return json.dumps(memories)
 
@@ -58,8 +65,8 @@ def show_memories():
 
     """
 
-    cur = g.db.execute('SELECT id, memory FROM memories ORDER BY id ASC')
-    memories = [dict(id=row[0], memory=row[1]) for row in cur.fetchall()]
+    cur = g.db.execute('SELECT id, memory, image FROM memories ORDER BY id ASC')
+    memories = [dict(id=row[0], memory=row[1], image=row[2]) for row in cur.fetchall()]
 
     return render_template('show_memories.html', memories=memories)
 
@@ -125,14 +132,39 @@ def add_memory():
     if len(memory_text) > app.config['MAX_CHARACTERS']:
         abort(400)
 
+    # delete the oldest to make room for the new
     g.db.execute('''
                  DELETE FROM memories
                  WHERE id NOT IN
                    (SELECT id FROM memories
                     ORDER BY id DESC LIMIT 9)
                  ''')
-    g.db.execute('insert into memories (memory) values (?)',
-                 [memory_text])
+
+    # if it's URI to image let's download it glitch it up and store as base64
+    mimetype, __ = mimetypes.guess_type(memory_text)
+
+    if mimetype and mimetype.startswith('image'):
+        # get the image from the net
+        urlopen_result = urllib2.urlopen(memory_text)
+        urlopen_result_io = io.BytesIO(urlopen_result.read())
+    
+        # open and tweak the image
+        tweaked_image = Image.open(urlopen_result_io)
+        tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'], app.config['THUMB_MAX_HEIGHT']])
+        tweaked_image = tweaked_image.convert(mode='P', palette=Image.ADAPTIVE, colors=random.randint(2, 10))
+    
+        # save the image as base64 HTML image
+        base64_image = StringIO()
+        tweaked_image.save(base64_image, "PNG", colors=1)
+        base64_string = base64.b64encode(base64_image.getvalue())
+    
+        g.db.execute('insert into memories (memory, image) values (?, ?)',
+                     [memory_text, base64_string])
+
+    else:
+        g.db.execute('insert into memories (memory) values (?)',
+                     [memory_text])
+
     g.db.commit()
     flash("A memory made, another forgotten")
 

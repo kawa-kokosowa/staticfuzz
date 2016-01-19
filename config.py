@@ -2,6 +2,9 @@ DATABASE = '/tmp/staticfuzz.db'
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
+THUMB_MAX_HEIGHT = 300
+THUMB_MAX_WIDTH = 300
+
 # Client poll/refresh rate in ms
 REFRESH = 500
 

@@ -4,6 +4,9 @@
   <ol id="memories">
     {% for memory in memories %}
       <li id="{{ memory.id }}">{{ memory.memory }}
+        {% if memory.image %}
+        <img src="data:image/png;base64,{{ memory.image }}" alt="{{ memory.id }}">
+        {% endif %}
         {% if session.logged_in %}
           <form action="{{ url_for('forget') }}" method=post>
             <input type="hidden" name="id" value={{ memory.id }}>
