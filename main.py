@@ -2,6 +2,7 @@ import io
 import json
 import random
 import base64
+import gevent
 import sqlite3
 import urllib2
 import mimetypes
@@ -10,10 +11,14 @@ from flask import *
 from PIL import Image, ImageOps
 from cStringIO import StringIO
 from contextlib import closing
+from gevent.pywsgi import WSGIServer
+from gevent import monkey
+monkey.patch_all()
 
 
 # Create and init the staticfuzz
 app = Flask(__name__)
+
 app.config.from_object("config")
 
 
@@ -23,6 +28,10 @@ def connect_db():
 
 
 def init_db():
+    """For use on command line for setting up
+    the database.
+
+    """
 
     with closing(connect_db()) as db:
 
@@ -48,6 +57,37 @@ def teardown_request(exception):
 
     if db is not None:
         db.close()
+
+
+def event():
+    latest_memory_id = 0
+
+    while True:
+
+        with app.app_context():
+            db = connect_db()
+            sql = "SELECT * FROM memories WHERE id > ? ORDER BY id ASC"
+
+            cursor = db.execute(sql, (latest_memory_id,))
+            query_results = cursor.fetchall()
+            db.close()
+
+        fields = ('id', 'memory', 'image')
+
+        if query_results:
+            latest_memory_id = query_results[-1][0]
+            newer_memories = [dict(zip(fields, row)) for row in query_results]
+
+            yield "data: " + json.dumps(newer_memories) + "\n\n"
+
+        with app.app_context():
+            gevent.sleep(app.config['SLEEP_RATE'])
+
+
+@app.route('/stream/', methods=['GET', 'POST'])
+def stream():
+
+    return Response(event(), mimetype="text/event-stream")
 
 
 @app.route('/list_memories')
@@ -224,5 +264,6 @@ def forget():
 
     return redirect(url_for('show_memories'))
 
+
 if __name__ == '__main__':
-    app.run()
+    WSGIServer(('', 5000), app).serve_forever()

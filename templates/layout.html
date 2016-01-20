@@ -6,148 +6,6 @@
       <meta name=viewport content="width=device-width, initial-scale=1">
       <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-      <script>
-          {% if config.NOTIFICATION_SOUND %}
-              var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
-          {% endif %} 
-
-
-          // notification system
-          var Notification = window.Notification || window.mozNotification || window.webkitNotification;
-
-          Notification.requestPermission(function (permission) {
-              // .. get permission for showing notifications
-              // console.log(permission);
-          });
-
-          function showNotification(memory) {
-              // display a notification for a new memory
-              var instance = new Notification("Staticfuzz Memory #" + memory.id, {
-                  body: memory.memory,
-                  icon: "http://staticfuzz.com/static/bg-wave.gif"
-              });
-
-              instance.onclick = function () {
-                  // Something to do
-              };
-              instance.onerror = function () {
-                  // Something to do
-              };
-              instance.onshow = function () {
-                  // Something to do
-              };
-              instance.onclose = function () {
-                  // Something to do
-              };
-
-              return false;
-          }
-
-          // flaten memory to list of ids
-          function onlyMemoryIds(memories) {
-              var ids = [];
-
-              $.each(memories, function( index, memory ) {
-                  ids.push(memory.id);
-              });
-
-              return ids
-          }
-
-          function pollMemories() {
-              $.ajax({
-                  url: "{{ url_for('list_memories') }}",
-                  dataType: 'json',
-                  cache: true,
-                  timeout: "{{ config.TIMEOUT }}",
-                  success: function(list_of_memories) {
-                      // We're going to determine if the newly polled list
-                      // of memories contains any new ones.
-                      //
-                      // First we start by finding the largest memory ID of
-                      // the memories polled.
-                      var largest_polled_id = 0;
-
-                      $.each(list_of_memories, function(index, memory) {
-                          if (memory.id > largest_polled_id) {
-                              largest_polled_id = memory.id;
-                          }
-
-                      });
-
-                      // ... then we find the largest memory ID on the HTML
-                      // page currently!
-                      var largest_html_id = parseInt($('#memories li:last').attr('id'));
-                      console.log($("#memories li").length);
-
-                      // If the largest ID from the polled memories is larger than the
-                      // ID from the HTML memories:
-                      if (largest_polled_id > largest_html_id) {
-
-                          // If there are already ten memories in the HTML,
-                          // remove the first <li> before we add another!
-                          if (largest_html_id == 0 | $("#memories li").length == 10) {
-                              $("#memories li:first-child").remove();
-                          }
-
-                          // Notification: pop up message if page isn't focused, optional sound
-                          {% if config.NOTIFICATION_SOUND %}
-                          notification_sound.play();
-                          {% endif %} 
-
-                          // last memory is the one with the highest id
-                          memory = list_of_memories[list_of_memories.length - 1];
-
-                          // only popup if the tab doesn't have focus
-                          if (! document.hasFocus()) {
-                              showNotification(memory);
-                          }
-
-                          var new_li = jQuery('<li />');
-                          new_li.attr('id', memory.id);
-
-                          // if have image append
-                          // this aint workin
-                          if (memory.image) {
-                              var link = jQuery('<a />');
-                              link.attr('href', memory.memory);
-
-                              var image = jQuery('<img />');
-                              image.attr('src', "data:image/png;base64," + memory.image);
-
-                              link.append(image);
-                              new_li.append(link);
-                          } else {
-                              new_li.text(memory.memory);
-                          }
-
-                          $('#memories').append(new_li);
-
-                          {% if session.logged_in %}
-                              var god_delete = jQuery("<form />");
-                              god_delete.attr("action", "{{ url_for("forget") }}");
-                              god_delete.attr("method", "post");
-
-                              var hidden_id = jQuery("<input />");
-                              god_delete.attr("type", "hidden");
-                              god_delete.attr("value", "");
-                              $('#memories').append('<input type="hidden" name="id" value='+memory.id+'>');
-                              $('#memories').append('<input type="submit" value="Forget">');
-                          {% endif %}
-
-                          $('#memories').append('</li>');
-
-                      }
-                  },  // end success
-                  error: function(){
-                      $('#memories').empty();
-                      $('#memories').append('<li>Error');
-                  }
-              });
-          }         
-
-          setInterval(pollMemories, "{{ config.REFRESH }}");
-      </script>
     </head>
     <body>
       <header>
@@ -179,18 +37,129 @@
           <p><a href="{{ url_for('logout') }}">goodbye</a></p>
 		{% endif %}
       </footer>
+      <!-- <script src="/sse.js"></script> -->
       <script>
-          // replace chat submit with ajax send
-          $('#diamond').removeAttr("method");
-          $('#diamond').removeAttr("action");
-          $("#diamond").on("submit", function (e) {
-              e.preventDefault();
-              // Send the data using post
-              var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
-              // reset input
-              $("#diamond input").val('');
-          });
+        {% if config.NOTIFICATION_SOUND %}
+            var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
+        {% endif %} 
 
+        // notification system
+        var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+
+        Notification.requestPermission(function (permission) {
+            // .. get permission for showing notifications
+            // console.log(permission);
+        });
+
+        function showNotification(memory) {
+            // display a notification for a new memory
+            var instance = new Notification("Staticfuzz Memory #" + memory.id, {
+                body: memory.memory,
+                icon: "http://staticfuzz.com/static/bg-wave.gif"
+            });
+
+            instance.onclick = function () {
+                // Something to do
+            };
+            instance.onerror = function () {
+                // Something to do
+            };
+            instance.onshow = function () {
+                // Something to do
+            };
+            instance.onclose = function () {
+                // Something to do
+            };
+
+            return false;
+        }
+
+        // flaten memory to list of ids
+        function onlyMemoryIds(memories) {
+            var ids = [];
+
+            $.each(memories, function( index, memory ) {
+                ids.push(memory.id);
+            });
+
+            return ids
+        }
+
+        // replace chat submit with ajax send
+        $('#diamond').removeAttr("method");
+        $('#diamond').removeAttr("action");
+        $("#diamond").on("submit", function (e) {
+            e.preventDefault();
+            // Send the data using post
+            var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
+            // reset input
+            $("#diamond input").val('');
+        });
+
+        /* Listen on event source. */
+
+        function listen() {
+            var source = new EventSource("/stream/");
+            source.onmessage = function(eventdata) {
+                console.log(eventdata);
+                var memories = JSON.parse(eventdata["data"]);
+
+                $.each(memories, function(index, memory) {
+                    // If there are already ten memories in the HTML,
+                    // remove the first <li> before we add another!
+                    if ($("#memories li").length == 10) {
+                        $("#memories li:first-child").remove();
+                    }
+
+                    // Notification: pop up message if page isn't focused, optional sound
+                    {% if config.NOTIFICATION_SOUND %}
+                    notification_sound.play();
+                    {% endif %} 
+
+                    // only popup if the tab doesn't have focus
+                    if (! document.hasFocus()) {
+                        showNotification(memory);
+                    }
+
+                    var new_li = jQuery('<li />');
+                    new_li.attr('id', memory.id);
+
+                    // If there's a base64 representation of the
+                    // url found in memory.memory, let's make this
+                    // an image memory.
+                    if (memory.image) {
+                        var link = jQuery('<a />');
+                        link.attr('href', memory.memory);
+
+                        var image = jQuery('<img />');
+                        image.attr('src', "data:image/png;base64," + memory.image);
+
+                        link.append(image);
+                        new_li.append(link);
+                    } else {  // regular memory
+                        new_li.text(memory.memory);
+                    }
+
+                    $('#memories').append(new_li);
+
+                    {% if session.logged_in %}
+                        var god_delete = jQuery("<form />");
+                        god_delete.attr("action", "{{ url_for("forget") }}");
+                        god_delete.attr("method", "post");
+
+                        var hidden_id = jQuery("<input />");
+                        god_delete.attr("type", "hidden");
+                        god_delete.attr("value", "");
+                        $('#memories').append('<input type="hidden" name="id" value='+memory.id+'>');
+                        $('#memories').append('<input type="submit" value="Forget">');
+                    {% endif %}
+
+                    $('#memories').append('</li>');
+                });
+            }
+        }
+
+        listen();
       </script>
     </body>
 </html>

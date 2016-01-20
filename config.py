@@ -7,11 +7,7 @@ THUMB_MAX_WIDTH = 360
 MIN_COLORS = 2
 MAX_COLORS = 10
 
-# Client poll/refresh rate in ms
-REFRESH = 500
-
-# Timeout in ms
-TIMEOUT = 30000
+SLEEP_RATE = 0.2
 
 # God/admin
 USERNAME = 'lain'
