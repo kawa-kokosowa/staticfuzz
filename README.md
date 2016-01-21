@@ -26,4 +26,4 @@ God is `lain` and password is `bear`.
 
 Free for commercial or any purpose (MIT license).
 
-Crafted by [Hypatia Software Organization](http://hypatia.software/)
+Crafted by [Hypatia Software Organization](http://hypatia.software/).
