@@ -31,7 +31,7 @@ html, body {
 
 body {
   font: 400 200%/1.5 'Averia Sans Libre';
-  background: rgba(33, 33, 33, 0.95);
+  background: rgba(33, 33, 33, 0.99);
   color: #d0ddd2;
   padding: 0 60px;
 }
@@ -47,8 +47,8 @@ h1, h2 {
 }
 
 h1 {
-  font-size: 261.79%; 
-  line-height: 3rem;
+  font-size: 4.5rem;
+  line-height: 4.5rem;
 }
 
 h1 a:link,
@@ -214,14 +214,18 @@ iframe {
 @media screen and (max-width: 400px)
 {
 
+  body {
+    padding: 0 10px;
+  }
+
   h1, header {
-    margin-top: 0;
+    margin-top: 1.5rem;
     padding-top: 0;
     line-height: 1.5rem;
   }
 
   h1 {
-    line-height: 1;
     line-height: 3rem;
+    font-size: 3rem;
   }
 }
