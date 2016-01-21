@@ -1,6 +1,6 @@
 # STATICFUZZ
 
-http://staticfuzz.com:5000/
+http://staticfuzz.com/
 
 Image board of ten anonymous memories.
 
