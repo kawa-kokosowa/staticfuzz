@@ -194,7 +194,7 @@ def glitch_from_url(url_string):
 
     # save as low quality jpg
     tweaked_image_io = StringIO()
-    tweaked_image.save(tweaked_image_io, format="JPEG", quality=20)
+    tweaked_image.save(tweaked_image_io, format="JPEG", quality=10)
     tweaked_image = Image.open(tweaked_image_io)
 
     # autocontrast
