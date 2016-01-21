@@ -117,12 +117,12 @@
                     // If there's a base64 representation of the
                     // url found in memory.text, let's make this
                     // an image memory.
-                    if (memory.image) {
+                    if (memory.base64_image) {
                         var link = jQuery('<a />');
                         link.attr('href', memory.text);
 
                         var image = jQuery('<img />');
-                        image.attr('src', "data:image/png;base64," + memory.image);
+                        image.attr('src', "data:image/png;base64," + memory.base64_image);
 
                         link.append(image);
                         new_li.append(link);

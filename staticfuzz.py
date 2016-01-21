@@ -207,7 +207,7 @@ def glitch_from_url(url_string):
     glitch_string = glitch_image.getvalue()
 
     # glitch right before encoding
-    for i in range(1, random.randint(1, 5)):
+    for i in range(1, random.randint(2, 4)):
         # splice
         start_point = random.randint(2500, len(glitch_string))
         end_point = start_point + random.randint(0, len(glitch_string) - start_point)
