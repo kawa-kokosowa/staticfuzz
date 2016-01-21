@@ -33,7 +33,8 @@ def glitch_from_url(url_string):
     tweaked_image = ImageOps.equalize(tweaked_image)
 
     # solarize
-    tweaked_image = ImageOps.solarize(tweaked_image, random.randint(1, 200))
+    tweaked_image = ImageOps.solarize(tweaked_image,
+                                      random.randint(1, 200))
 
     # random chance to flip
     if random.randint(0, 4):
