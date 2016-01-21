@@ -1,16 +1,23 @@
-# staticfuzz
-http://staticfuzz.com/
+# STATICFUZZ
 
-10 anonymous memories, from oldest to newest.
+http://staticfuzz.com:5000/
 
-New memories make me forget old ones.
+Image board of ten anonymous memories.
+
+Every new memory makes the oldest vanish forever.
+
+## Why use?
+
+  * Efficient: asynchronous, server sent event (SEE/EventSource)
+  * Easy to configure: `config.py`
+  * Great notification system
 
 ## Running
 
   1. `pip install -r requirements.txt`
-  2. `flask -a main.py initdb`
-  3. `python main.py`
+  2. `python staticfuzz.py initdb`
+  2. `python staticfuzz.py serve`
+
+Then you open http://localhost:5000/ in a web browser.
 
 God is `lain` and password is `bear`.
-
-Checkout `config.py`.
