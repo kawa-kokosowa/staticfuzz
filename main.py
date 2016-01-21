@@ -1,7 +1,25 @@
-"""gunicorn -b 127.0.0.1:5000 -k gevent main:app"""
+"""staticfuzz: async transient textboard
+
+If this script is invoked directly, it can be used
+as a CLI for managing staticfuzz.
+
+You can test this by running:
+    gunicorn -b 127.0.0.1:5000 -k gevent main:app
+
+Usage:
+    staticfuzz.py init_db
+    staticfuzz.py serve
+    staticfuzz.py -h | --help
+
+Options:
+    -h --help    Show this screen.
+
+"""
+
 
 import io
 import json
+import docopt
 import random
 import base64
 import gevent
@@ -268,4 +286,10 @@ def forget():
 
 
 if __name__ == '__main__':
-    WSGIServer(('', 5000), app).serve_forever()
+    arguments = docopt.docopt(__doc__)
+
+    if arguments["init_db"]:
+        init_db()
+
+    if arguments["serve"]:
+        WSGIServer(('', 5000), app).serve_forever()
