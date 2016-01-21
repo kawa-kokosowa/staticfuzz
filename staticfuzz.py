@@ -89,7 +89,12 @@ def init_db():
 def event():
 
     with app.app_context():
-        latest_memory_id = Memory.query.order_by(Memory.id.desc()).first().id
+
+        try:
+            latest_memory_id = Memory.query.order_by(Memory.id.desc()).first().id
+        except AttributeError:
+            # .id will raise AttributeError if the query doesn't match anything
+            latest_memory_id = 0
 
     while True:
 
