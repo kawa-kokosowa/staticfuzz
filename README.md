@@ -21,3 +21,9 @@ Every new memory makes the oldest vanish forever.
 Then you open http://localhost:5000/ in a web browser.
 
 God is `lain` and password is `bear`.
+
+## Built with love
+
+Free for commercial or any purpose (MIT license).
+
+Crafted by [Hypatia Software Organization](http://hypatia.software/)
