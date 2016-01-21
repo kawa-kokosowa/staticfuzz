@@ -1,4 +1,4 @@
-"""staticfuzz: async transient textboard
+"""staticfuzz: async SSE transient textboard
 
 If this script is invoked directly, it can be used
 as a CLI for managing staticfuzz.
@@ -28,6 +28,7 @@ import urllib2
 import mimetypes
 
 from flask import *
+from flask_sqlalchemy import SQLAlchemy
 from PIL import Image, ImageOps
 from cStringIO import StringIO
 from contextlib import closing
@@ -38,13 +39,41 @@ monkey.patch_all()
 
 # Create and init the staticfuzz
 app = Flask(__name__)
-
 app.config.from_object("config")
+db = SQLAlchemy(app)
 
 
-def connect_db():
+class Memory(db.Model):
+    __tablename__ = "memories"
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Unicode(140), unique=True)
+    base64_image = db.Column(db.String(), unique=True)
 
-    return sqlite3.connect(app.config['DATABASE'])
+    def __init__(self, text, base64_image=None):
+        self.text = text
+        self.base64_image = base64_image
+
+    def __repr__(self):
+
+        return "<Memory #%d: %s>" % (self.id, self.text)
+
+    @classmethod
+    def from_dict(cls, memory_dict):
+        
+        return cls(text=memory_dict["text"],
+                   base64_image=memory_dict.get("base64_image"))
+
+    def to_dict(self):
+
+        return {"text": self.text,
+                "base64_image": self.base64_image,
+                "id": self.id}
+
+    def newer_than(self, id):
+
+        return (Memory.query.
+                filter(Memory.id > id).
+                order_by(Memory.id.asc()))
 
 
 def init_db():
@@ -53,50 +82,24 @@ def init_db():
 
     """
 
-    with closing(connect_db()) as db:
-
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-
-        db.commit()
-
-
-@app.before_request
-def before_request():
-    """For each request, init a db connection before and
-    close it afterwards.
-
-    """
-
-    g.db = connect_db()
-
-
-@app.teardown_request
-def teardown_request(exception):
-    db = getattr(g, 'db', None)
-
-    if db is not None:
-        db.close()
+    db.drop_all()
+    db.create_all()
 
 
 def event():
-    latest_memory_id = 0
+
+    with app.app_context():
+        latest_memory_id = Memory.query.order_by(Memory.id.desc()).first().id
 
     while True:
 
         with app.app_context():
-            db = connect_db()
-            sql = "SELECT * FROM memories WHERE id > ? ORDER BY id ASC"
+            memories = (Memory.query.filter(Memory.id > latest_memory_id).
+                        order_by(Memory.id.asc()).all())
 
-            cursor = db.execute(sql, (latest_memory_id,))
-            query_results = cursor.fetchall()
-            db.close()
-
-        fields = ('id', 'memory', 'image')
-
-        if query_results:
-            latest_memory_id = query_results[-1][0]
-            newer_memories = [dict(zip(fields, row)) for row in query_results]
+        if memories:
+            latest_memory_id = memories[-1].id
+            newer_memories = [memory.to_dict() for memory in memories]
 
             yield "data: " + json.dumps(newer_memories) + "\n\n"
 
@@ -106,17 +109,12 @@ def event():
 
 @app.route('/stream/', methods=['GET', 'POST'])
 def stream():
+    """SSE (Server Side Events), for an EventSource. Send
+    the event of a new message.
+
+    """
 
     return Response(event(), mimetype="text/event-stream")
-
-
-@app.route('/list_memories')
-def list_memories():
-
-    cur = g.db.execute('SELECT id, memory, image FROM memories ORDER BY id ASC')
-    memories = [{'id': row[0], 'memory': row[1], 'image': row[2]} for row in cur.fetchall()]
-
-    return json.dumps(memories)
 
 
 @app.route('/')
@@ -125,10 +123,11 @@ def show_memories():
 
     """
 
-    cur = g.db.execute('SELECT id, memory, image FROM memories ORDER BY id ASC')
-    memories = [dict(id=row[0], memory=row[1], image=row[2]) for row in cur.fetchall()]
+    memories = Memory.query.order_by(Memory.id.asc()).all()
+    memories_for_jinja = [memory.to_dict() for memory in memories]
 
-    return render_template('show_memories.html', memories=memories)
+    return render_template('show_memories.html',
+                           memories=memories_for_jinja)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -212,54 +211,51 @@ def glitch_from_url(url_string):
     return base64_string
 
 
-@app.route('/add_memory', methods=['POST'])
-def add_memory():
-    """Remember something; add a memory.
+@app.route('/new_memory', methods=['POST'])
+def new_memory():
+    """Attempt to add a new memory.
     
-    Then forget the 11th oldest memory.
+    Forget the 11th oldest memory.
+
+    The memory must meet these requirements:
+
+      * At least 1 character long
+      * 140 characters or less
+      * Cannot already exist in the database
 
     """
 
-    memory_text = request.form['memory'].strip()
+    # The text submitted to us from POST
+    memory_text = request.form['text'].strip()
 
+    # memory must be at least 1 char
     if len(memory_text) == 0:
         
         return redirect(url_for('show_memories'))
 
-    # you cannot repost something already in the memories
-    cursor = g.db.execute("SELECT memory FROM memories WHERE memory=?", (memory_text,))
-
-    if cursor.fetchall():
-
-        return redirect(url_for('show_memories'))
-
-    # if memory is longer than MAX_CHARACTERS
-    # then we send a bad request
+    # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
         abort(400)
 
+    # you cannot repost something already in the memories
+    if Memory.query.filter_by(text=memory_text).all():
+
+        return redirect(url_for('show_memories'))
+
     # delete the oldest to make room for the new
-    g.db.execute('''
-                 DELETE FROM memories
-                 WHERE id NOT IN
-                   (SELECT id FROM memories
-                    ORDER BY id DESC LIMIT 9)
-                 ''')
+    #Memory.query.all().group_by(Memory.id.asc()).first().delete()
 
     # if it's URI to image let's download it glitch it up and store as base64
     mimetype, __ = mimetypes.guess_type(memory_text)
 
     if mimetype and mimetype.startswith('image'):
-        base64_string = glitch_from_url(memory_text)
-    
-        g.db.execute('insert into memories (memory, image) values (?, ?)',
-                     [memory_text, base64_string])
-
+        base64_image = glitch_from_url(memory_text)
     else:
-        g.db.execute('insert into memories (memory) values (?)',
-                     [memory_text])
+        base64_image = None
 
-    g.db.commit()
+    new_memory = Memory(text=memory_text, base64_image=base64_image)
+    db.session.add(new_memory)
+    db.session.commit()
     flash("A memory made, another forgotten")
 
     return redirect(url_for('show_memories'))
@@ -276,10 +272,8 @@ def forget():
     if not session.get('logged_in'):
         abort(401)  # action forbidden
 
-    print "The id is " + request.form['id']
-    g.db.execute('delete from memories where id=?',
-                 [request.form['id']])
-    g.db.commit()
+    Memory.query.filter_by(id=request.form["id"]).delete()
+    db.session.commit()
     flash('Forgotten.')
 
     return redirect(url_for('show_memories'))

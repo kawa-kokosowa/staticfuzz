@@ -54,7 +54,7 @@
         function showNotification(memory) {
             // display a notification for a new memory
             var instance = new Notification("Staticfuzz Memory #" + memory.id, {
-                body: memory.memory,
+                body: memory.text,
                 icon: "http://staticfuzz.com/static/bg-wave.gif"
             });
 
@@ -74,24 +74,13 @@
             return false;
         }
 
-        // flaten memory to list of ids
-        function onlyMemoryIds(memories) {
-            var ids = [];
-
-            $.each(memories, function( index, memory ) {
-                ids.push(memory.id);
-            });
-
-            return ids
-        }
-
         // replace chat submit with ajax send
         $('#diamond').removeAttr("method");
         $('#diamond').removeAttr("action");
         $("#diamond").on("submit", function (e) {
             e.preventDefault();
             // Send the data using post
-            var posting = $.post("{{ url_for('add_memory') }}", { "memory": $("#diamond input").val() } );
+            var posting = $.post("{{ url_for('new_memory') }}", { "text": $("#diamond input").val() } );
             // reset input
             $("#diamond input").val('');
         });
@@ -112,12 +101,13 @@
                     }
 
                     // Notification: pop up message if page isn't focused, optional sound
-                    {% if config.NOTIFICATION_SOUND %}
-                    notification_sound.play();
-                    {% endif %} 
+
 
                     // only popup if the tab doesn't have focus
                     if (! document.hasFocus()) {
+                        {% if config.NOTIFICATION_SOUND %}
+                        notification_sound.play();
+                        {% endif %} 
                         showNotification(memory);
                     }
 
@@ -125,11 +115,11 @@
                     new_li.attr('id', memory.id);
 
                     // If there's a base64 representation of the
-                    // url found in memory.memory, let's make this
+                    // url found in memory.text, let's make this
                     // an image memory.
                     if (memory.image) {
                         var link = jQuery('<a />');
-                        link.attr('href', memory.memory);
+                        link.attr('href', memory.text);
 
                         var image = jQuery('<img />');
                         image.attr('src', "data:image/png;base64," + memory.image);
@@ -137,7 +127,7 @@
                         link.append(image);
                         new_li.append(link);
                     } else {  // regular memory
-                        new_li.text(memory.memory);
+                        new_li.text(memory.text);
                     }
 
                     $('#memories').append(new_li);

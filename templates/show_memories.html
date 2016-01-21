@@ -6,11 +6,11 @@
       <li id="{{ memory.id }}">
 
         {% if memory.image %}
-        <a href="{{ memory.memory }}">
+        <a href="{{ memory.text }}">
           <img src="data:image/png;base64,{{ memory.image }}" alt="{{ memory.id }}">
         </a>
         {% else %}
-        {{ memory.memory}}
+        {{ memory.text}}
         {% endif %}
 
         {% if session.logged_in %}
@@ -28,8 +28,8 @@
     <p id="flash">{{ message }}</p>
   {% endfor %}
 
-  <form action="{{ url_for('add_memory') }}" id="diamond" method=post>
-    <input type="text" name="memory" autocomplete="off"
+  <form action="{{ url_for('new_memory') }}" id="diamond" method=post>
+    <input type="text" name="text" autocomplete="off"
            maxlength="{{ config.MAX_CHARACTERS }}" autofocus>
   </form>
 

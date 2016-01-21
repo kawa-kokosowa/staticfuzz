@@ -3,3 +3,4 @@ gunicorn
 gevent
 pillow
 docopt
+flask_sqlalchemy

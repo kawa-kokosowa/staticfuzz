@@ -1,4 +1,4 @@
-DATABASE = '/tmp/staticfuzz.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/staticfuzz.db'
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
