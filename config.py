@@ -2,6 +2,8 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/staticfuzz.db'
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
+FIRST_MESSAGE = u'scream into the void'
+
 THUMB_MAX_HEIGHT = 360
 THUMB_MAX_WIDTH = 360
 MIN_COLORS = 2

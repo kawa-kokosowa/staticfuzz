@@ -49,9 +49,16 @@ class Memory(db.Model):
     text = db.Column(db.Unicode(140), unique=True)
     base64_image = db.Column(db.String(), unique=True)
 
-    def __init__(self, text, base64_image=None):
+    def __init__(self, text):
         self.text = text
-        self.base64_image = base64_image
+
+        # if it's URI to image let's download it glitch it up and store as base64
+        mimetype, __ = mimetypes.guess_type(text)
+
+        if mimetype and mimetype.startswith(u'image'):
+            self.base64_image = glitch_from_url(text)
+        else:
+            self.base64_image = None
 
     def __repr__(self):
 
@@ -84,6 +91,10 @@ def init_db():
 
     db.drop_all()
     db.create_all()
+
+    new_memory = Memory(text=app.config["FIRST_MESSAGE"])
+    db.session.add(new_memory)
+    db.session.commit()
 
 
 def event():
@@ -247,18 +258,12 @@ def new_memory():
 
         return redirect(url_for('show_memories'))
 
-    # delete the oldest to make room for the new
-    #Memory.query.all().group_by(Memory.id.asc()).first().delete()
+    # if ten entries in db, delete oldest to make room for new
+    if Memory.query.count() == 10:
+        memory_to_delete = Memory.query.order_by(Memory.id.asc()).first()
+        db.session.delete(memory_to_delete)
 
-    # if it's URI to image let's download it glitch it up and store as base64
-    mimetype, __ = mimetypes.guess_type(memory_text)
-
-    if mimetype and mimetype.startswith('image'):
-        base64_image = glitch_from_url(memory_text)
-    else:
-        base64_image = None
-
-    new_memory = Memory(text=memory_text, base64_image=base64_image)
+    new_memory = Memory(text=memory_text)
     db.session.add(new_memory)
     db.session.commit()
     flash("A memory made, another forgotten")
