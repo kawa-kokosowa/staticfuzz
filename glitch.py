@@ -3,6 +3,7 @@
 """
 
 import io
+import sys
 import urllib2
 import random
 import base64
@@ -10,6 +11,31 @@ import base64
 from flask import current_app as app
 from PIL import Image, ImageOps
 from cStringIO import StringIO
+
+
+def atkinson_dither(pil_image):
+    img = pil_image.convert('L')
+
+    threshold = 128*[0] + 128*[255]
+
+    for y in range(img.size[1]):
+
+        for x in range(img.size[0]):
+
+            old = img.getpixel((x, y))
+            new = threshold[old]
+            err = (old - new) >> 3 # divide by 8
+
+            img.putpixel((x, y), new)
+
+            for nxy in [(x+1, y), (x+2, y), (x-1, y+1), (x, y+1), (x+1, y+1), (x, y+2)]:
+
+                try:
+                    img.putpixel(nxy, img.getpixel(nxy) + err)
+                except IndexError:
+                    pass
+
+    return img
 
 
 def glitch_from_url(url_string):
@@ -22,11 +48,6 @@ def glitch_from_url(url_string):
     tweaked_image = Image.open(urlopen_result_io)
     tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'],
                              app.config['THUMB_MAX_HEIGHT']])
-
-    # save as low quality jpg
-    tweaked_image_io = StringIO()
-    tweaked_image.save(tweaked_image_io, format="JPEG", quality=10)
-    tweaked_image = Image.open(tweaked_image_io)
 
     # autocontrast
     tweaked_image = ImageOps.autocontrast(tweaked_image)
@@ -43,36 +64,24 @@ def glitch_from_url(url_string):
     if random.randint(0, 4):
         tweaked_image = ImageOps.equalize(tweaked_image)
 
-    # random chance to invert
-    if random.randint(0, 2):
-        tweaked_image = ImageOps.invert(tweaked_image)
-
     max_colors = random.randint(app.config['MIN_COLORS'],
     app.config['MAX_COLORS'])
     tweaked_image = tweaked_image.convert(mode='P',
                                           palette=Image.ADAPTIVE,
                                           colors=max_colors)
+    tweaked_image = atkinson_dither(tweaked_image)
+    tweaked_image = ImageOps.colorize(tweaked_image,
+                                      (random.randint(0, 255),
+                                       random.randint(0, 255),
+                                       random.randint(0, 255)),
+                                      (random.randint(0, 255),
+                                       random.randint(0, 255),
+                                       random.randint(0, 255)))
 
     # save the image as base64 HTML image
     glitch_image = StringIO()
     tweaked_image.save(glitch_image, "PNG", optimize=True)
     glitch_string = glitch_image.getvalue()
-
-    # glitch right before encoding
-    for i in range(1, random.randint(2, 3)):
-        start_point = random.randint(len(glitch_string) / 2, len(glitch_string))
-        end_point = start_point + random.randint(0, len(glitch_string) - start_point)
-        section = glitch_string[start_point:end_point]
-
-        repeated = ''
-
-        for i in range(1, random.randint(1, 5)):
-            repeated += section
-
-    new_start_point = random.randint(2500, len(glitch_string))
-    new_end_point = new_start_point + random.randint(0, len(glitch_string) - new_start_point)
-    glitch_string = glitch_string[:new_start_point] + repeated + glitch_string[new_end_point:]
-
     base64_string = base64.b64encode(glitch_string)
 
     return base64_string
