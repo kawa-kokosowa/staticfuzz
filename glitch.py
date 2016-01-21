@@ -49,6 +49,13 @@ def glitch_from_url(url_string):
     tweaked_image.thumbnail([app.config['THUMB_MAX_WIDTH'],
                              app.config['THUMB_MAX_HEIGHT']])
 
+    # add artifacts/save as low quality jpeg
+    # save as low quality jpg
+    tweaked_image_io = StringIO()
+    tweaked_image.save(tweaked_image_io, format="JPEG",
+                       quality=random.randint(5, 20))
+    tweaked_image = Image.open(tweaked_image_io)
+
     # autocontrast
     tweaked_image = ImageOps.autocontrast(tweaked_image)
     tweaked_image = ImageOps.equalize(tweaked_image)
