@@ -147,12 +147,15 @@ header,
 footer {
   color: #d0ddd2;
   animation: fuzz 0.04s infinite;
+  position: relative;
+  top: 0;
+  left: relative;
 }
 
 @keyframes fuzz {
-  0%  {opacity: 1; margin-left: 0;}
-  50% {opacity: 0.99; margin-left: 1px;}
-  100% {opacity: 1; margin-left: 0px;}
+  0%  {opacity: 1; left: 0; top: 1px;}
+  50% {opacity: 0.98; left: 1px; top: 1px;}
+  100% {opacity: 1; left: 0px; top: 1px;}
 }
 
 li:nth-child(1) {
