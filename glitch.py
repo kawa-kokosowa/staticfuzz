@@ -45,7 +45,9 @@ def atkinson_dither(pil_image):
 
 def glitch_from_url(url_string):
     # get the image from the net
-    urlopen_result = urllib2.urlopen(url_string)
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    req = urllib2.Request(url_string, None, headers)
+    urlopen_result = urllib2.urlopen(req)
     urlopen_result_io = io.BytesIO(urlopen_result.read())
 
     # open and tweak the image
