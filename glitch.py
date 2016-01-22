@@ -14,6 +14,11 @@ from cStringIO import StringIO
 
 
 def atkinson_dither(pil_image):
+    """Give credit to that blog post that you got this
+    from!!!!!
+
+    """
+
     img = pil_image.convert('L')
 
     threshold = 128*[0] + 128*[255]
@@ -77,13 +82,19 @@ def glitch_from_url(url_string):
                                           palette=Image.ADAPTIVE,
                                           colors=max_colors)
     tweaked_image = atkinson_dither(tweaked_image)
+
+    # we have a 1-bit image because of the atkinson dither,
+    # now we must generate a random color and get its inverse
+    first_color = (random.randint(0, 255),
+                   random.randint(0, 255),
+                   random.randint(0, 255))
+    inverse_color = (abs(first_color[0] - 255),
+                     abs(first_color[1] - 255),
+                     abs(first_color[2] - 255))
+                       
     tweaked_image = ImageOps.colorize(tweaked_image,
-                                      (random.randint(0, 255),
-                                       random.randint(0, 255),
-                                       random.randint(0, 255)),
-                                      (random.randint(0, 255),
-                                       random.randint(0, 255),
-                                       random.randint(0, 255)))
+                                      first_color,
+                                      inverse_color)
 
     # save the image as base64 HTML image
     glitch_image = StringIO()
