@@ -90,6 +90,9 @@
 
         function listen() {
             var source = new EventSource("/stream/");
+            source.onerror = function(eventdata) {
+                // i feel like this should do something major...
+            }
             source.onmessage = function(eventdata) {
                 console.log(eventdata);
                 var memories = JSON.parse(eventdata["data"]);
