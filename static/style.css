@@ -141,11 +141,14 @@ h2 {
   font-size: 1rem;
 }
 
+#memories li {
+  color: #d0ddd2;
+}
+
 #memories li,
 header,
 #diamond,
 footer {
-  color: #d0ddd2;
   animation: fuzz 0.04s infinite;
   position: relative;
   top: 0;
