@@ -146,12 +146,12 @@ header,
 #diamond,
 footer {
   color: #d0ddd2;
-  animation: fuzz 0.01s infinite;
+  animation: fuzz 0.04s infinite;
 }
 
 @keyframes fuzz {
   0%  {opacity: 1; margin-left: 0;}
-  50% {opacity: 0.6; margin-left: 5px;}
+  50% {opacity: 0.99; margin-left: 1px;}
   100% {opacity: 1; margin-left: 0px;}
 }
 
