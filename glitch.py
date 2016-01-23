@@ -14,8 +14,11 @@ from cStringIO import StringIO
 
 
 def atkinson_dither(pil_image):
-    """Give credit to that blog post that you got this
-    from!!!!!
+    """Classic Mac 1 bit dither.
+
+    Credit goes to Michal Migurski.
+
+    http://mike.teczno.com/notes/atkinson.html
 
     """
 

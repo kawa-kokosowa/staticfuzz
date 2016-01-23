@@ -44,12 +44,31 @@ limiter = Limiter(app)
 
 
 class Memory(db.Model):
+    """SQLAlchemy/database abstraction of a memory.
+
+    Fields:
+        id: The unique identifier for this memory.
+        text: String, the text of the memory, the
+            memory itself.
+        base64_image: if `text` is a URI to an image,
+            then this is the base64 encoding of said
+            image.
+
+    """
+
     __tablename__ = "memories"
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Unicode(140), unique=True)
     base64_image = db.Column(db.String(), unique=True)
 
     def __init__(self, text):
+        """
+
+        Args:
+            text (str): Hopefully a valid URI to an image.
+
+        """
+
         self.text = text
 
         # if it's URI to image let's download it glitch it up and store as base64
@@ -66,11 +85,32 @@ class Memory(db.Model):
 
     @classmethod
     def from_dict(cls, memory_dict):
+        """Create a new memory based on a dictionary.
+
+        Args:
+            memory_dict (dict): Keys are the fields for
+                a memory. It looks like this:
+
+                >>> {'text': "foo", "base64_image": None}
+
+        Returns:
+            Memory: Created from a dictionary, for you to
+                save in a database!
+
+        """
         
         return cls(text=memory_dict["text"],
                    base64_image=memory_dict.get("base64_image"))
 
     def to_dict(self):
+        """Return a dictionary representation of this Memory.
+
+        Returns:
+            dict: Looks something like this:
+
+                >>> {'text': "foo", "base64_image": None}
+
+        """
 
         return {"text": self.text,
                 "base64_image": self.base64_image,
@@ -78,6 +118,12 @@ class Memory(db.Model):
 
 
 class SlashCommandResponse(object):
+    """All SlashCommand.callback() methods must return this.
+
+    See Also:
+        SlashCommand
+
+    """
 
     def __init__(self, to_database, value):
         """The result of a slash command.
@@ -98,6 +144,9 @@ class SlashCommandResponse(object):
 class SlashCommand(object):
     """/something to be executed instead of posted.
 
+    When a piece of text is sent, it is compared against
+    all SlashCommands to possibly trigger those commands.
+
     The callback() static method must return a boolean as
     the first index value of the result, e.g.:
 
@@ -113,27 +162,55 @@ class SlashCommand(object):
 
     @classmethod
     def attempt(cls, text):
-        pattern = "/" + cls.NAME + " "
+        """Return either None or the SlashCommandResponse
+        associated with running the command.
 
-        if text.startswith(pattern):
-            text = text.replace(pattern, "")
-            args = text.split(" ")
-            
-            return cls.callback(*args)
+        Returns:
+            SlashCommandResponse|None: Returns None if
+                `text` is not even this command. Otherwise
+                return the result of executing this command.
+
+        """
+
+        pattern = u"/" + cls.NAME
+
+        if text.startswith(pattern + u" ") or text == pattern:
+            text = text.replace(pattern, u"")
+            args = [arg.strip() for arg in text.split(" ") if arg.strip()]
+
+            try:
+
+                return cls.callback(*args)
+
+            except TypeError:
+
+                return SlashCommandResponse(False, (u"%s incorrect args" % cls.NAME, 400))
 
         else:
 
             return None
 
+    @staticmethod
+    def callback(*args):
+        """Ovverride this with another staticmethod; do something
+        with the args, return a SlashCommandResponse.
+
+        """
+
+        pass
+
 
 class SlashLogin(SlashCommand):
+    """Login as god if the secret is correct.
+
+    """
+
     NAME = u"login"
 
     @staticmethod
-    def callback(*args):
-        secret_attempt = args[0]
+    def callback(secret_attempt):
 
-        if secret_attmpt == app.config['WHISPER_SECRET']:
+        if secret_attempt == app.config['WHISPER_SECRET']:
             session['logged_in'] = True
             flash(app.config["GOD_GREET"])
 
@@ -145,6 +222,10 @@ class SlashLogin(SlashCommand):
 
 
 class SlashLogout(SlashCommand):
+    """Stop being god.
+
+    """
+
     NAME = u"logout"
 
     @staticmethod
@@ -156,22 +237,39 @@ class SlashLogout(SlashCommand):
 
 
 class SlashDanbooru(SlashCommand):
+    """Get a random image from Danbooru from tags.
+
+    """
+
     NAME = u"danbooru"
 
     @staticmethod
     def callback(*args):
+        """
+
+        Args:
+          *args (list[str]): Each element is a string/tag
+            to search for, e.g., "goo_girl"
+
+        """
+
         tags = "%20".join(args)
         endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
         r = requests.get(endpoint)
         results = r.json()
 
         try:
+            selected_image = ("http://danbooru.donmai.us" +
+                              random.choice(results)["file_url"])
 
-            return SlashCommandResponse(True, "http://danbooru.donmai.us" + random.choice(results)["file_url"])
+            return SlashCommandResponse(True, selected_image)
 
         except IndexError:
 
-            return SlashCommandResponse(False, app.config["ERROR_DANBOORU"], 400)
+            # There were no results!
+            return SlashCommandResponse(False,
+                                        app.config["ERROR_DANBOORU"],
+                                        400)
 
 
 @app.errorhandler(429)
@@ -198,6 +296,16 @@ def init_db():
 
 
 def event():
+    """EventSource stream; server side events. Used for
+    sending out new memories.
+
+    Returns:
+        json event (str): --
+
+    See Also:
+        stream()
+
+    """
 
     with app.app_context():
 
@@ -228,6 +336,9 @@ def event():
 def stream():
     """SSE (Server Side Events), for an EventSource. Send
     the event of a new message.
+
+    See Also:
+        event()
 
     """
 
@@ -261,9 +372,10 @@ def new_memory():
       * 140 characters or less
       * Cannot already exist in the database
 
+    The memory is checked for possible SlashCommand(s).
+
     """
 
-    # The text submitted to us from POST
     memory_text = request.form['text'].strip()
 
     # memory must be at least 1 char
@@ -283,7 +395,10 @@ def new_memory():
 
         elif result.to_database is True:
             memory_text = result.value
-        else:
+
+            break
+
+        elif result.to_database is False:
 
             return result.value
         
@@ -306,7 +421,6 @@ def new_memory():
     new_memory = Memory(text=memory_text)
     db.session.add(new_memory)
     db.session.commit()
-    flash("A memory made, another forgotten")
 
     return redirect(url_for('show_memories'))
 
@@ -324,7 +438,6 @@ def forget():
 
     Memory.query.filter_by(id=request.form["id"]).delete()
     db.session.commit()
-    flash('Forgotten.')
 
     return redirect(url_for('show_memories'))
 
