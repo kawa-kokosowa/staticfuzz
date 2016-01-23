@@ -102,6 +102,7 @@ h2 {
 
 #memories img {
   background: #212121;
+  max-width: 100%;
 }
 
 #memories {
@@ -267,8 +268,12 @@ iframe {
 
 /* Mobile/responsive stuff... */
 
-@media screen and (max-width: 400px)
+@media screen and (max-width: 540px)
 {
+
+  html, body {
+      background: rgba(33, 33, 33, 1);
+  }
 
   body {
     padding: 20px;
