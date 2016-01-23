@@ -271,7 +271,12 @@ iframe {
 {
 
   body {
-    padding: 0 10px;
+    padding: 20px;
+  }
+
+  #memories {
+    margin-left: 0;
+    margin-right: 0;
   }
 
   h1, header {
