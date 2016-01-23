@@ -76,11 +76,102 @@ class Memory(db.Model):
                 "base64_image": self.base64_image,
                 "id": self.id}
 
-    def newer_than(self, id):
 
-        return (Memory.query.
-                filter(Memory.id > id).
-                order_by(Memory.id.asc()))
+class SlashCommandResponse(object):
+
+    def __init__(self, to_database, value):
+        """The result of a slash command.
+
+        Args:
+            to_database (bool): If True the response is
+                carried to the database, otherwise it
+                is returned to the enduser.
+            value (any): Any data returned from the slash
+                command.
+
+        """
+
+        self.to_database = to_database
+        self.value = value
+        
+
+class SlashCommand(object):
+    """/something to be executed instead of posted.
+
+    The callback() static method must return a boolean as
+    the first index value of the result, e.g.:
+
+    >>> add(1, 1,)
+    True, 2
+
+    The boolean represents if we return out (drop return
+    to page).
+
+    """
+
+    NAME = str()
+
+    @classmethod
+    def attempt(cls, text):
+        pattern = "/" + cls.NAME + " "
+
+        if text.startswith(pattern):
+            text = text.replace(pattern, "")
+            args = text.split(" ")
+            
+            return cls.callback(*args)
+
+        else:
+
+            return None
+
+
+class SlashLogin(SlashCommand):
+    NAME = u"login"
+
+    @staticmethod
+    def callback(*args):
+        secret_attempt = args[0]
+
+        if secret_attmpt == app.config['WHISPER_SECRET']:
+            session['logged_in'] = True
+            flash(app.config["GOD_GREET"])
+
+            return SlashCommandResponse(False, redirect(url_for('show_memories')))
+
+        else:
+
+            return SlashCommandResponse(False, app.config["LOGIN_FAIL"], 401)
+
+
+class SlashLogout(SlashCommand):
+    NAME = u"logout"
+
+    @staticmethod
+    def callback():
+        session.pop('logged_in', None)
+        flash(app.config["GOD_GOODBYE"])
+
+        return SlashCommandResponse(False, redirect(url_for('show_memories')))
+
+
+class SlashDanbooru(SlashCommand):
+    NAME = u"danbooru"
+
+    @staticmethod
+    def callback(*args):
+        tags = "%20".join(args)
+        endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
+        r = requests.get(endpoint)
+        results = r.json()
+
+        try:
+
+            return SlashCommandResponse(True, "http://danbooru.donmai.us" + random.choice(results)["file_url"])
+
+        except IndexError:
+
+            return SlashCommandResponse(False, app.config["ERROR_DANBOORU"], 400)
 
 
 @app.errorhandler(429)
@@ -90,15 +181,6 @@ def ratelimit_handler(e):
     """
 
     return app.config["ERROR_RATE_EXCEEDED"], 429
-
-
-def danbooru_image(tags):
-    endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
-    r = requests.get(endpoint)
-    results = r.json()
-    random_image = "http://danbooru.donmai.us" + random.choice(results)["file_url"]
-
-    return random_image
 
 
 def init_db():
@@ -189,28 +271,22 @@ def new_memory():
 
         return u"Too short!", 400
 
-    # is this a command?
-    if memory_text.startswith(u'/login '):
+    # commands
+    slash_commands = [SlashLogin, SlashLogout, SlashDanbooru]
+    
+    for slash_command in slash_commands:
+        result = slash_command.attempt(memory_text)
 
-        if memory_text == u'/login ' + app.config['WHISPER_SECRET']:
-            session['logged_in'] = True
-            flash(app.config["GOD_GREET"])
+        if result is None:
 
-            return redirect(url_for('show_memories'))
+            continue
 
+        elif result.to_database is True:
+            memory_text = result.value
         else:
 
-            return app.config["LOGIN_FAIL"], 401
-
-    elif memory_text == u'/logout':
-        session.pop('logged_in', None)
-        flash(app.config["GOD_GOODBYE"])
-
-        return redirect(url_for('show_memories'))
-
-    elif memory_text.startswith(u"/danbooru "):
-        memory_text = memory_text.replace(u"/danbooru ", "")
-        memory_text = danbooru_image(memory_text)
+            return result.value
+        
 
     # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
