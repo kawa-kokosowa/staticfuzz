@@ -2,9 +2,7 @@
 
 http://staticfuzz.com/
 
-Image board of ten anonymous memories.
-
-Every new memory makes the oldest vanish forever.
+A board for ten anonymous memories. Each new memory replaces the oldest. 
 
 ## Why use?
 
