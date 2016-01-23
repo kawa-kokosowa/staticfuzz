@@ -49,11 +49,12 @@ body::before {
     opacity : .1;
     -webkit-animation: vline 5s linear infinite;
     animation: vline 5s linear infinite;
+    overflow: auto;
 }
 
 @-webkit-keyframes vline {
   0%   { top: 0px;height:5px;}
-  100% { top: 100vh;height:0px;}
+  100% { top: 100%;height:0px;}
 }
 
 body::after {
