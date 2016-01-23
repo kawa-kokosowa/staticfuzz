@@ -18,11 +18,13 @@ Options:
 
 
 import json
+import random
 import glitch
 import docopt
 import base64
 import gevent
 import sqlite3
+import requests
 import mimetypes
 
 from flask import *
@@ -88,6 +90,15 @@ def ratelimit_handler(e):
     """
 
     return app.config["ERROR_RATE_EXCEEDED"], 429
+
+
+def danbooru_image(tags):
+    endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
+    r = requests.get(endpoint)
+    results = r.json()
+    random_image = "http://danbooru.donmai.us" + random.choice(results)["file_url"]
+
+    return random_image
 
 
 def init_db():
@@ -197,10 +208,9 @@ def new_memory():
 
         return redirect(url_for('show_memories'))
 
-    elif memory_text == u"/wipe":
-
-        if not session.get('logged_in'):
-            abort(401)
+    elif memory_text.startswith(u"/danbooru "):
+        memory_text = memory_text.replace(u"/danbooru ", "")
+        memory_text = danbooru_image(memory_text)
 
     # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
