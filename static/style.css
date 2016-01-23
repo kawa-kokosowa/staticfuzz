@@ -259,17 +259,18 @@ iframe {
 }
 
 #error {
-  background: url('error.gif') no-repeat center center fixed #ff0000;
-  background-size: cover;
   font-size: 4.5rem;
-  color: #e82b7a;
   text-transform: uppercase;
-    position: fixed;
-    height: 100vh;
-    width: 100vw;
+  color: #e82b7a;
+  position: fixed;
+    background: url('error.gif') no-repeat center center fixed #ff0000;
+    background-size: cover;
+    z-index: 10;
     top: 0;
     left: 0;
-    z-index: 9;
+    height: 100vh;
+    width: 100vw;
+
     animation: fadeOut 2s;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;

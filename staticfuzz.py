@@ -81,6 +81,15 @@ class Memory(db.Model):
                 order_by(Memory.id.asc()))
 
 
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    """Handle rate exceeding error message.
+
+    """
+
+    return u"Not so fast!", 429
+
+
 def init_db():
     """For use on command line for setting up
     the database.
