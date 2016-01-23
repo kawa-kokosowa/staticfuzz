@@ -1,14 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h2>Who's god?</h2>
+  <h2>Whisper a secret</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-    <form action="{{ url_for('login') }}" method=post>
-      <dl>
-        <dt>God is...
-        <dd><input type=text name=username>
-        <dt>Whisper something sweet...
-        <dd><input type=password name=password>
-        <dd><input type=submit value=Login>
-      </dl>
-  </form>
+    <form action="{{ url_for('whisper') }}" method=post>
+      <input type=text name=secret>
+    </form>
 {% endblock %}

@@ -12,8 +12,7 @@ MAX_COLORS = 10
 SLEEP_RATE = 0.2
 
 # God/admin
-USERNAME = 'lain'
-PASSWORD = 'bear'
+WHISPER_SECRET = 'lain'
 
 # Maximum number of characters for memories.
 MAX_CHARACTERS = 140

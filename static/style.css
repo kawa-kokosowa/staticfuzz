@@ -98,11 +98,13 @@ h1 a:visited {
 h2 {
   font-size: 138.2%;
   line-height: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 #memories img {
   background: #212121;
   max-width: 100%;
+  float: left;
 }
 
 #memories {
@@ -210,9 +212,17 @@ ol li form {
   display: inline-block;
 }
 
-ol li form input[type=submit] {
-  font: 400 100%/1.625 'Averia Sans Libre';
+ol li form input[value=Forget] {
+  /* forget */
+  font: 400 0.75rem/1 'Averia Sans Libre';
+  float: right;
+  padding: 0 10px;
   border: none;
+  font-weight: bold;
+  transform: rotate(45deg);
+  margin-left: -2rem;
+  margin-top: -2rem;
+  z-index: 0;
 }
 
 footer {

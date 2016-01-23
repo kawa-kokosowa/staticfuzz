@@ -142,9 +142,11 @@ def show_memories():
                            memories=memories_for_jinja)
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """God logs in.
+@app.route('/whisper', methods=['GET', 'POST'])
+def whisper():
+    """God whispers the secret word.
+
+    Login as god.
 
     """
 
@@ -152,9 +154,7 @@ def login():
 
     if request.method == 'POST':
 
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        if request.form['secret'] != app.config['WHISPER_SECRET']:
             error = 'Invalid password'
         else:
             session['logged_in'] = True

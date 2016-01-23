@@ -16,12 +16,11 @@
 	    {% block body %}{% endblock %}
       </main>
       <footer>
-        <p>10 anonymous memories, from oldest to newest.</p>
-
-        <p>New memories make me forget old ones.</p>
+        <p>Post board of ten anonymous memories. Every new memory makes
+        the oldest vanish forever.</p>
         
-        <p>The <a href="https://github.com/hypatia-software-org/staticfuzz">
-        staticfuzz GitHub repository</a> is maintained by
+        <p><a href="https://github.com/hypatia-software-org/staticfuzz">
+        GitHub repository</a>; software by
         <a href="http://hypatia.software">Hypatia Software Organization</a>.</p>
 
         {% if config.BACKGROUND_MP3 %}
@@ -32,9 +31,9 @@
         {% endif %}
 
         {% if not session.logged_in %}
-          <p><a href="{{ url_for('login') }}">god?</a></p>
+          <p><a href="{{ url_for('whisper') }}">Whisper a secret?</a></p>
 		{% else %}
-          <p><a href="{{ url_for('logout') }}">goodbye</a></p>
+          <p><a href="{{ url_for('logout') }}">Whisper "Goodbye."</a></p>
 		{% endif %}
       </footer>
       <!-- <script src="/sse.js"></script> -->
@@ -115,8 +114,11 @@
                         showNotification(memory);
                     }
 
-                    var new_li = jQuery('<li />');
+                    var new_li = jQuery('<li>');
                     new_li.attr('id', memory.id);
+
+                    var article = jQuery('<article>');
+                    article.attr('class', 'memory');
 
                     // If there's a base64 representation of the
                     // url found in memory.text, let's make this
@@ -129,26 +131,27 @@
                         image.attr('src', "data:image/png;base64," + memory.base64_image);
 
                         link.append(image);
-                        new_li.append(link);
+                        article.append(link);
                     } else {  // regular memory
-                        new_li.text(memory.text);
+                        article.text(memory.text);
                     }
 
-                    $('#memories').append(new_li);
-
                     {% if session.logged_in %}
-                        var god_delete = jQuery("<form />");
-                        god_delete.attr("action", "{{ url_for("forget") }}");
-                        god_delete.attr("method", "post");
+                        var god_delete_form = jQuery("<form />");
+                        god_delete_form.attr("action", "{{ url_for("forget") }}");
+                        god_delete_form.attr("method", "post");
 
                         var hidden_id = jQuery("<input />");
-                        god_delete.attr("type", "hidden");
-                        god_delete.attr("value", "");
-                        $('#memories').append('<input type="hidden" name="id" value='+memory.id+'>');
-                        $('#memories').append('<input type="submit" value="Forget">');
+                        god_delete_form.attr("type", "hidden");
+                        god_delete_form.attr("value", "");
+                        god_delete_form.append('<input type="hidden" name="id" value='+memory.id+'>');
+                        god_delete_form.append('<input type="submit" value="Forget">');
+                        article.append(god_delete_form);
                     {% endif %}
 
-                    $('#memories').append('</li>');
+                    new_li.append(article);
+                    $('#memories').append(new_li);
+
                 });
             }
         }
