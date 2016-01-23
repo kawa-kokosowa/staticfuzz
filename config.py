@@ -25,3 +25,5 @@ MAX_CHARACTERS = 140
 # If this is enabled the specified MP3 is used
 # as a notification for new messages.
 NOTIFICATION_SOUND = '/static/notification.ogg'
+
+ERROR_SOUND = '/static/error.ogg'

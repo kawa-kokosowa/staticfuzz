@@ -26,6 +26,7 @@ import sqlite3
 import mimetypes
 
 from flask import *
+from flask_limiter import Limiter
 from flask_sqlalchemy import SQLAlchemy
 from contextlib import closing
 from gevent.pywsgi import WSGIServer
@@ -37,6 +38,7 @@ monkey.patch_all()
 app = Flask(__name__)
 app.config.from_object("config")
 db = SQLAlchemy(app)
+limiter = Limiter(app)
 
 
 class Memory(db.Model):
@@ -120,6 +122,7 @@ def event():
 
 
 @app.route('/stream/', methods=['GET', 'POST'])
+@limiter.limit("15/minute")
 def stream():
     """SSE (Server Side Events), for an EventSource. Send
     the event of a new message.
@@ -130,6 +133,7 @@ def stream():
 
 
 @app.route('/')
+@limiter.limit("2/second")
 def show_memories():
     """Show the memories.
 
@@ -143,6 +147,7 @@ def show_memories():
 
 
 @app.route('/whisper', methods=['GET', 'POST'])
+@limiter.limit("10/hour")
 def whisper():
     """God whispers the secret word.
 
@@ -178,6 +183,7 @@ def logout():
 
 
 @app.route('/new_memory', methods=['POST'])
+@limiter.limit("1/second")
 def new_memory():
     """Attempt to add a new memory.
     
@@ -196,17 +202,18 @@ def new_memory():
 
     # memory must be at least 1 char
     if len(memory_text) == 0:
-        
-        return redirect(url_for('show_memories'))
+
+        return u"Too short!", 400
 
     # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
-        abort(400)
+
+        return u"Too long!", 400
 
     # you cannot repost something already in the memories
     if Memory.query.filter_by(text=memory_text).all():
 
-        return redirect(url_for('show_memories'))
+        return u"Unoriginal!", 400
 
     # if ten entries in db, delete oldest to make room for new
     if Memory.query.count() == 10:

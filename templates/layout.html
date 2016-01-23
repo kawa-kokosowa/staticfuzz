@@ -41,6 +41,7 @@
       <script>
         {% if config.NOTIFICATION_SOUND %}
             var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
+            var error_sound = new Audio('{{ config.ERROR_SOUND}}');
         {% endif %} 
 
         // notification system
@@ -55,8 +56,9 @@
             // display a notification for a new memory
             var instance = new Notification("Staticfuzz Memory #" + memory.id, {
                 body: memory.text,
-                icon: "http://staticfuzz.com/static/bg-wave.gif"
+                icon: "http://staticfuzz.com/static/bg-wave.gif",
             });
+            instance.silent
 
             instance.onclick = function () {
                 window.focus();
@@ -83,7 +85,22 @@
         $("#diamond").on("submit", function (e) {
             e.preventDefault();
             // Send the data using post
-            var posting = $.post("{{ url_for('new_memory') }}", { "text": $("#diamond input").val() } );
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('new_memory') }}",
+                data: {"text": $("#diamond input").val()},
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    $("#diamond label").remove();
+                    var error_message = jQuery('<label id=error for=text />');
+                    error_message.text(XMLHttpRequest.responseText);
+                    $("#diamond").append(error_message);
+                    {% if config.NOTIFICATION_SOUND %}
+                    error_sound.play();
+                    {% endif %} 
+
+                }
+            });
+
             // reset input
             $("#diamond input").val('');
         });
