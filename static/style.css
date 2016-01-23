@@ -214,15 +214,27 @@ ol li form {
 
 ol li form input[value=Forget] {
   /* forget */
-  font: 400 0.75rem/1 'Averia Sans Libre';
-  float: right;
-  padding: 0 10px;
+  font: 400 0.75rem/1.5rem 'Averia Sans Libre';
   border: none;
+  padding: 0 10px;
   font-weight: bold;
-  transform: rotate(45deg);
-  margin-left: -2rem;
-  margin-top: -2rem;
   z-index: 0;
+  width: 100%;
+  background: #8fe81f;
+  cursor: crosshair;
+}
+
+ol li a {
+  display: block;
+  float: left;
+}
+
+a + form {
+    width: 6rem;
+    transform: rotate(45deg);
+    position: absolute;
+    float: left;
+    margin-left: -5rem;
 }
 
 footer {
@@ -304,4 +316,9 @@ iframe {
     line-height: 3rem;
     font-size: 3rem;
   }
+
+    ol li form input[value=Forget] {
+      /* forget */
+    }
+
 }
