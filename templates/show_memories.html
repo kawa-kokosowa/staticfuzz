@@ -4,7 +4,7 @@
   <ol id="memories">
     {% for memory in memories %}
       <li id="{{ memory.id }}">
-
+        <article class="memory">
         {% if memory.base64_image %}
         <a href="{{ memory.text }}">
           <img src="data:image/png;base64,{{ memory.base64_image }}" alt="{{ memory.id }}">
@@ -19,6 +19,8 @@
             <input type="submit" value="Forget">
           </form>
         {% endif %}
+        </article>
+      </li>
 	{% endfor %}
   </ol>
 
