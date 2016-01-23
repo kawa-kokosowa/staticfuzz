@@ -101,6 +101,10 @@ h2 {
   margin-top: 1.5rem;
 }
 
+p + p {
+    margin-top: 1.5rem;
+}
+
 #memories img {
   background: #212121;
   max-width: 100%;
@@ -239,7 +243,8 @@ a + form {
 
 footer {
   display: inline-block;
-  font-size: 61.8%;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
   margin: 1.5rem 0;
 }
 
