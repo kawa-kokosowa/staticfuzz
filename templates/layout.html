@@ -91,6 +91,8 @@
             var source = new EventSource("/stream/");
             source.onerror = function(eventdata) {
                 // i feel like this should do something major...
+                this.close();
+                listen();
             }
             source.onmessage = function(eventdata) {
                 console.log(eventdata);
