@@ -22,9 +22,7 @@ import glitch
 import docopt
 import base64
 import gevent
-import urllib
 import sqlite3
-import urllib2
 import mimetypes
 
 from flask import *
