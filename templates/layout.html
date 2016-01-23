@@ -59,7 +59,9 @@
 
             instance.onclick = function () {
                 window.focus();
-                this.cancel();
+                var top = document.getElementById(memory.id).offsetTop
+                window.scrollTo(0, top);
+                this.close();
             };
             instance.onerror = function () {
                 // Something to do

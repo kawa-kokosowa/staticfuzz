@@ -123,6 +123,10 @@ h2 {
   color: #d0ddd2;
 }
 
+#memories li:active {
+  background: #ff0000;
+}
+
 .memory {
     display: inline-block;
 }
