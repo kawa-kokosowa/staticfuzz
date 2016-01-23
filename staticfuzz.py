@@ -203,12 +203,22 @@ class SlashCommand(object):
 class SlashLogin(SlashCommand):
     """Login as god if the secret is correct.
 
+    Note:
+        You have to refresh the page for this to work.
+
     """
 
     NAME = u"login"
 
     @staticmethod
     def callback(secret_attempt):
+        """Attempt to use secret_attempt to login.
+
+        Args:
+            secret_attempt (str): Password/whisper secret
+                being attempted.
+
+        """
 
         if secret_attempt == app.config['WHISPER_SECRET']:
             session['logged_in'] = True
@@ -224,12 +234,17 @@ class SlashLogin(SlashCommand):
 class SlashLogout(SlashCommand):
     """Stop being god.
 
+    Note:
+        You have to refresh the page for this to work.
+
     """
 
     NAME = u"logout"
 
     @staticmethod
     def callback():
+        """User who sent this will no longer be a god."""
+
         session.pop('logged_in', None)
         flash(app.config["GOD_GOODBYE"])
 

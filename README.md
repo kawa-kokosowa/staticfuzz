@@ -20,6 +20,14 @@ Then you open http://localhost:5000/ in a web browser.
 
 God is `lain` and password is `bear`.
 
+## Creating your own SlashCommand
+
+Create a class which inherits from `SlashCommand`, has a class constant
+`NAME` which is the command used to execute the command, without the slash.
+
+Add a `@staticmethod` called `callback` which returns a `SlashCommandResponse`
+object. That's it!
+
 ## Built with love
 
 Free for commercial or any purpose (MIT license).
