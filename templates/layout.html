@@ -11,15 +11,7 @@
     <body>
       <header>
         <h1><a href="/">STATICFUZZ</a></h1>
-        <p>Here for a blink of an eye.</p>
-      </header>
-      <main>
-	    {% block body %}{% endblock %}
-      </main>
-      <footer>
-        <p>&loz; A board for ten anonymous memories. Each new memory replaces
-        the oldest. &loz;</p>
-        
+        <p>Text+ board; 10 anonymous memories&mdash;newest replaces oldest.</p>
         <p><a href="https://github.com/hypatia-software-org/staticfuzz">
         GitHub repository</a>; software by
         <a href="http://hypatia.software">Hypatia Software Organization</a>.</p>
@@ -30,13 +22,11 @@
             Your browser does not support the audio element.
           </audio>
         {% endif %}
-
-        {% if not session.logged_in %}
-          <p><a href="{{ url_for('whisper') }}">Whisper a secret?</a></p>
-		{% else %}
-          <p><a href="{{ url_for('logout') }}">Whisper "Goodbye."</a></p>
-		{% endif %}
-      </footer>
+     
+      </header>
+      <main>
+	    {% block body %}{% endblock %}
+      </main>
       <!-- <script src="/sse.js"></script> -->
       <script>
         {% if config.NOTIFICATION_SOUND %}

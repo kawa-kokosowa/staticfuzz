@@ -80,6 +80,10 @@ header {
   font-weight: 700;
 }
 
+header p + p {
+    font-size: 1rem;
+}
+
 h1, h2 {
   color: #fff430;
 }

@@ -22,7 +22,9 @@ import glitch
 import docopt
 import base64
 import gevent
+import urllib
 import sqlite3
+import urllib2
 import mimetypes
 
 from flask import *
@@ -87,7 +89,7 @@ def ratelimit_handler(e):
 
     """
 
-    return u"Not so fast!", 429
+    return app.config["ERROR_RATE_EXCEEDED"], 429
 
 
 def init_db():
@@ -155,42 +157,6 @@ def show_memories():
                            memories=memories_for_jinja)
 
 
-@app.route('/whisper', methods=['GET', 'POST'])
-@limiter.limit("10/hour")
-def whisper():
-    """God whispers the secret word.
-
-    Login as god.
-
-    """
-
-    error = None
-
-    if request.method == 'POST':
-
-        if request.form['secret'] != app.config['WHISPER_SECRET']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash("Hello, god.")
-
-            return redirect(url_for('show_memories'))
-
-    return render_template('login.html', error=error)
-
-
-@app.route('/logout')
-def logout():
-    """God goes bye!
-
-    """
-
-    session.pop('logged_in', None)
-    flash('God goes "bye!"')
-
-    return redirect(url_for('show_memories'))
-
-
 @app.route('/new_memory', methods=['POST'])
 @limiter.limit("1/second")
 def new_memory():
@@ -214,15 +180,39 @@ def new_memory():
 
         return u"Too short!", 400
 
+    # is this a command?
+    if memory_text.startswith(u'/login '):
+
+        if memory_text == u'/login ' + app.config['WHISPER_SECRET']:
+            session['logged_in'] = True
+            flash(app.config["GOD_GREET"])
+
+            return redirect(url_for('show_memories'))
+
+        else:
+
+            return app.config["LOGIN_FAIL"], 401
+
+    elif memory_text == u'/logout':
+        session.pop('logged_in', None)
+        flash(app.config["GOD_GOODBYE"])
+
+        return redirect(url_for('show_memories'))
+
+    elif memory_text == u"/wipe":
+
+        if not session.get('logged_in'):
+            abort(401)
+
     # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
 
-        return u"Too long!", 400
+        return app.config["ERROR_TOO_LONG"], 400
 
     # you cannot repost something already in the memories
     if Memory.query.filter_by(text=memory_text).all():
 
-        return u"Unoriginal!", 400
+        return app.config["ERROR_UNORIGINAL"], 400
 
     # if ten entries in db, delete oldest to make room for new
     if Memory.query.count() == 10:
@@ -246,7 +236,7 @@ def forget():
     """
 
     if not session.get('logged_in'):
-        abort(401)  # action forbidden
+        abort(401)
 
     Memory.query.filter_by(id=request.form["id"]).delete()
     db.session.commit()

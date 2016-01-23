@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block body %}
-  <h2>Whisper a secret</h2>
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-    <form action="{{ url_for('whisper') }}" method=post>
-      <input type=text name=secret autocomplete="off">
-    </form>
-{% endblock %}

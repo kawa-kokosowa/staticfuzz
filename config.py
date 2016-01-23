@@ -27,3 +27,14 @@ MAX_CHARACTERS = 140
 NOTIFICATION_SOUND = '/static/notification.ogg'
 
 ERROR_SOUND = '/static/error.ogg'
+
+# Localization, Text, Messages
+# A bunch of string values.
+GOD_GREET = "Make everyone forget"
+LOGIN_FAIL = "I don't think so."
+GOD_GOODBYE = "Memory is your mistress."
+
+# ERRORS
+ERROR_TOO_LONG = u"Too long!"
+ERROR_UNORIGINAL = u"Unoriginal!"
+ERROR_RATE_EXCEEDED = u"Not so fast!"
