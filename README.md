@@ -47,10 +47,12 @@ class Sum(SlashCommand):
         return SlashCommandResponse(True, sum(args))
 ```
 
-The above example saves the sum of the arguments (to the database), if
-any of the arguments aren't a number, HTTP error 400 "x is not a number!"
-is sent. If you supply `/sum 1 2 3` it will write `6` to the database. If
-you supply `/sum a b c` a 400 (and the error message) will be returned back.
+The above saves the sum of arguments to the database. The first arg of
+`SlashCommandResponse` is a `bool`: if `True`, the result is saved to
+the database, otherwise it's sent to the visitor as a response. If any
+of the supplied arguments aren't a number, response is HTTP error 400.
+If you supply `/sum 1 2 3` it will write `6` to the database. If you
+input `/sum a b c` a 400 will be served.
 
 `callback()` does not need to take any arguments at all. It can take any
 number of arguments, something like `def callback(only_one):` works!
