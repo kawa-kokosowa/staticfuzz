@@ -1,8 +1,13 @@
-/* Grey: #d0ddd2
- * Yellow: #fff430
- * Magenta: #e82b7a
- * Green: 8fe81f
- * Black: #212121
+/* S T A T I C F U Z Z
+ *
+ * Hopefully mobile/responsive.
+ *
+ * Colors used:
+ *   - Grey: #d0ddd2
+ *   - Yellow: #fff430
+ *   - Magenta: #e82b7a
+ *   - Green: 8fe81f
+ *   - Black: #212121
  */
 
 @import url(https://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700,700italic,400italic);
@@ -14,24 +19,20 @@
   position: relative;
 }
 
-html {
-  background: url('bg-green.gif') no-repeat center center fixed #000;
-  background-size: cover;
-  height: 100vh;
-}
-
-html, body {
-  text-align: center;
-  word-break: break-all;
-  width: 100vw;
-}
-
 body {
-  font: 400 200%/1.5 'Averia Sans Libre';
-  background: rgba(33, 33, 33, 0.99);
+  text-align: center;
+  background: linear-gradient( rgba(33, 33, 33, 0.99), rgba(33, 33, 33, 0.99) ),
+              url('bg-green.gif');
+  background-color: #000;
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  word-break: break-all;
+  font: 400 32px/1.5rem 'Averia Sans Libre';  /* total row height is 48px */
   color: #d0ddd2;
-    padding: 0 60px;
-    width: 100vw;
+  padding: 0 60px;
+  width: 100vw;
+  min-height: 100vh;
 }
 
 body::before {
@@ -75,13 +76,18 @@ body::after {
 }
 
 header {
-  padding: 3rem 0 0 0;  
   color: #e82b7a;
-  font-weight: 700;
+  display: block;
+  margin-top: 3rem;
+}
+
+header p {
+  line-height: 3rem;
 }
 
 header p + p {
-    font-size: 1rem;
+  line-height: 3rem;
+  font-size: 0.75rem;
 }
 
 h1, h2 {
@@ -89,8 +95,8 @@ h1, h2 {
 }
 
 h1 {
-  font-size: 4.5rem;
-  line-height: 4.5rem;
+  font-size: 3rem;
+  line-height: 3rem;
 }
 
 h1 a:link,
@@ -105,10 +111,6 @@ h2 {
   margin-top: 1.5rem;
 }
 
-p + p {
-    margin-top: 1.5rem;
-}
-
 #memories img {
   background: #212121;
   max-width: 100%;
@@ -117,18 +119,28 @@ p + p {
 
 #memories {
   list-style-type: none;
-  margin: 1.5rem 20px;
+  margin: 6rem 0;
+  display: block;
 }
 
 #memories > li:before {
   content: attr(id);
   color: #fff;
   font-weight: 700;
-  font-size: 1rem;
+  display: inline-block;
+  line-height: 3rem;
+  background: url(bullet.gif) 0 0 repeat;
+  background-size: cover;
 }
+
 
 #memories li {
   color: #d0ddd2;
+  margin: 3rem 20px 0 20px;
+  line-height: 3rem;
+}
+
+#memories li + li {
 }
 
 .memory {
@@ -185,19 +197,6 @@ li:nth-child(8) {
 
 li:nth-child(9) {
   opacity: 0.90;
-}
-
-li:before {
-  content: "";
-  position: relative;
-  display: inline-block;
-  background: url(bullet.gif) 0 0 repeat;
-  background-size: cover;
-  transform: rotate(280deg);
-}
-
-li + li {
-  margin-top: 1.5rem;
 }
 
 a:link,
@@ -295,27 +294,6 @@ iframe {
   }
 
   body {
-    padding: 20px;
+    padding: 0 20px;
   }
-
-  #memories {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  h1, header {
-    margin-top: 1.5rem;
-    padding-top: 0;
-    line-height: 1.5rem;
-  }
-
-  h1 {
-    line-height: 3rem;
-    font-size: 3rem;
-  }
-
-    ol li form input[value=Forget] {
-      /* forget */
-    }
-
 }

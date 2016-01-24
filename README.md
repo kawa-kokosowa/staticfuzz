@@ -10,6 +10,8 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
   * Easy to configure: `config.py`
   * Great notification system
   * Easy to extend, add commands
+  * Nothing is ever written to disk! If you want, STATICFUZZ *can*
+    use just about any database system.
 
 ## Running
 
