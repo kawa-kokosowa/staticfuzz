@@ -78,7 +78,7 @@ body::after {
 header {
   color: #e82b7a;
   display: block;
-  margin-top: 3rem;
+  padding-top: 3rem;
 }
 
 header p {
