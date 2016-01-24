@@ -94,6 +94,10 @@
 
             // reset input
             $("#diamond input").val('');
+
+            // change background
+            var randomId = new Date().getTime();
+            $("body").css("background-image", "linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('/random_image?random=" + randomId + "')");
         });
 
         /* Listen on event source. */
