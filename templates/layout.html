@@ -43,6 +43,12 @@
             // console.log(permission);
         });
 
+        function changeBackground() {
+            // change background
+            var randomId = new Date().getTime();
+            $("body").css("background-image", "linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('/random_image?random=" + randomId + "')");
+        }
+
         function showNotification(memory) {
             // display a notification for a new memory
             var instance = new Notification("Staticfuzz Memory #" + memory.id, {
@@ -96,8 +102,7 @@
             $("#diamond input").val('');
 
             // change background
-            var randomId = new Date().getTime();
-            $("body").css("background-image", "linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('/random_image?random=" + randomId + "')");
+            changeBackground();
         });
 
         /* Listen on event source. */
@@ -112,6 +117,7 @@
             source.onmessage = function(eventdata) {
                 console.log(eventdata);
                 var memories = JSON.parse(eventdata["data"]);
+                changeBackground();
 
                 $.each(memories, function(index, memory) {
                     // If there are already ten memories in the HTML,
