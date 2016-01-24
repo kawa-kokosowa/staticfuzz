@@ -38,8 +38,10 @@ monkey.patch_all()  # NOTE: totally cargo culting this one
 # Create and init the staticfuzz
 app = flask.Flask(__name__)
 app.config.from_object("config")
-db = SQLAlchemy(app)
 limiter = Limiter(app)
+
+db = SQLAlchemy(app)
+
 
 
 class Memory(db.Model):
@@ -459,6 +461,13 @@ def forget():
 
     return flask.redirect(flask.url_for('show_memories'))
 
+
+# NOTE: this is all the way at the bottom so we can use init_db!
+if app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:":
+    # Use memory SQLITE database! Meaning the HDD is never touched!
+    # Since this database will be in the memory, we have to create
+    # it at the beginning of every app run.
+    init_db()
 
 if __name__ == '__main__':
     arguments = docopt.docopt(__doc__)

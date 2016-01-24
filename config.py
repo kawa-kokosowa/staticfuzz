@@ -1,4 +1,15 @@
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/staticfuzz.db'
+# Where memories will be temporarily kept.
+#SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/staticfuzz.db'
+
+# Database for memories.
+#
+# Use a sqlite database file on disk:
+#
+#   SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/staticfuzz.db'
+#   
+# Use sqlite memory database (never touches disk):
+SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 

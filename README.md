@@ -9,6 +9,7 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
   * Efficient: asynchronous, server sent event (SEE/EventSource)
   * Easy to configure: `config.py`
   * Great notification system
+  * Easy to extend, add commands
 
 ## Running
 
@@ -17,8 +18,6 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
   2. `python staticfuzz.py serve`
 
 Then you open http://localhost:5000/ in a web browser.
-
-God is `lain` and password is `bear`.
 
 ## Creating your own SlashCommand
 
@@ -53,6 +52,15 @@ you supply `/sum a b c` a 400 (and the error message) will be returned back.
 
 `callback()` does not need to take any arguments at all. It can take any
 number of arguments, something like `def callback(only_one):` works!
+
+### Included
+
+  * `/login secret`: login so you can delete memories. sadly, you need to
+    manually refresh after logging in. Try `/login lain` (default).
+  * `/logout`: if you are logged in, this will log you out. again, you need
+    manually refresh after.
+  * `/danbooru search some tags`: Get a random image from
+    [Danbooru](http://danbooru.donmai.us/) which matches the supplied tags.
 
 ## Built with love
 
