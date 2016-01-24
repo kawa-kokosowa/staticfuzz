@@ -29,32 +29,30 @@ Add a `@staticmethod` called `callback` which returns a `SlashCommandResponse`
 object. That's it! Example:
 
 ```python
-class AddCouple(SlashCommand):
-    NAME = 'add`
-
-    @staticmethod
-    def callback(a, b):
-
-        return SlashCommandResponse(True, a + b)
-```
-
-The above will add the two arguments supplied when the user
-types something like `/add 4 9`. You can also do things like:
-
-```python
 class Sum(SlashCommand):
     NAME = 'sum`
 
     @staticmethod
     def callback(*args):
 
+        for arg in args:
+            
+            try:
+                __ = int(arg)
+            except ValueError:
+
+                return SlashCommandResponse(False, ("%s is not a number!" % arg, 400))
+
         return SlashCommandResponse(True, sum(args))
 ```
 
-The above will save the sum of all arguments passed to the
-database. So if you supply `/sum 1 2 3` it'd put 6 in the DB.
+The above example saves the sum of the arguments (to the database), if
+any of the arguments aren't a number, HTTP error 400 "x is not a number!"
+is sent. If you supply `/sum 1 2 3` it will write `6` to the database. If
+you supply `/sum a b c` a 400 (and the error message) will be returned back.
 
-`callback()` does not need to take any arguments at all.
+`callback()` does not need to take any arguments at all. It can take any
+number of arguments, something like `def callback(only_one):` works!
 
 ## Built with love
 

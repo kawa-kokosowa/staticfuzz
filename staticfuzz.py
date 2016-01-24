@@ -17,27 +17,26 @@ Options:
 """
 
 
-import json
-import random
-import glitch
-import docopt
-import base64
-import gevent
-import sqlite3
-import requests
 import mimetypes
+import random
+import json
 
-from flask import *
+import flask
+import docopt
+import gevent
+import requests
 from flask_limiter import Limiter
 from flask_sqlalchemy import SQLAlchemy
-from contextlib import closing
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
-monkey.patch_all()
 
+import glitch
+
+
+monkey.patch_all()  # NOTE: totally cargo culting this one
 
 # Create and init the staticfuzz
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config.from_object("config")
 db = SQLAlchemy(app)
 limiter = Limiter(app)
@@ -61,7 +60,7 @@ class Memory(db.Model):
     text = db.Column(db.Unicode(140), unique=True)
     base64_image = db.Column(db.String(), unique=True)
 
-    def __init__(self, text):
+    def __init__(self, text, base64_image=None):
         """
 
         Args:
@@ -72,12 +71,15 @@ class Memory(db.Model):
         self.text = text
 
         # if it's URI to image let's download it glitch it up and store as base64
-        mimetype, __ = mimetypes.guess_type(text)
-
-        if mimetype and mimetype.startswith(u'image'):
-            self.base64_image = glitch.glitch_from_url(text)
+        if base64_image:
+            self.base64_image = base64_image
         else:
-            self.base64_image = None
+            mimetype = mimetypes.guess_type(text)[0]
+
+            if mimetype and mimetype.startswith(u'image'):
+                self.base64_image = glitch.glitch_from_url(text)
+            else:
+                self.base64_image = None
 
     def __repr__(self):
 
@@ -98,7 +100,7 @@ class Memory(db.Model):
                 save in a database!
 
         """
-        
+
         return cls(text=memory_dict["text"],
                    base64_image=memory_dict.get("base64_image"))
 
@@ -139,7 +141,7 @@ class SlashCommandResponse(object):
 
         self.to_database = to_database
         self.value = value
-        
+
 
 class SlashCommand(object):
     """/something to be executed instead of posted.
@@ -221,14 +223,15 @@ class SlashLogin(SlashCommand):
         """
 
         if secret_attempt == app.config['WHISPER_SECRET']:
-            session['logged_in'] = True
+            flask.session['logged_in'] = True
             flash(app.config["GOD_GREET"])
+            redirect = flask.redirect(flask.url_for('show_memories'))
 
-            return SlashCommandResponse(False, redirect(url_for('show_memories')))
+            return SlashCommandResponse(False, redirect)
 
         else:
 
-            return SlashCommandResponse(False, app.config["LOGIN_FAIL"], 401)
+            return SlashCommandResponse(False, (app.config["LOGIN_FAIL"], 401))
 
 
 class SlashLogout(SlashCommand):
@@ -270,8 +273,7 @@ class SlashDanbooru(SlashCommand):
 
         tags = "%20".join(args)
         endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
-        r = requests.get(endpoint)
-        results = r.json()
+        results = requests.get(endpoint).json()
 
         try:
             selected_image = ("http://danbooru.donmai.us" +
@@ -283,13 +285,15 @@ class SlashDanbooru(SlashCommand):
 
             # There were no results!
             return SlashCommandResponse(False,
-                                        app.config["ERROR_DANBOORU"],
-                                        400)
+                                        (app.config["ERROR_DANBOORU"], 400))
 
 
 @app.errorhandler(429)
-def ratelimit_handler(e):
+def ratelimit_handler(error):
     """Handle rate exceeding error message.
+
+    Args:
+        error (?): automagically provided
 
     """
 
@@ -305,8 +309,8 @@ def init_db():
     db.drop_all()
     db.create_all()
 
-    new_memory = Memory(text=app.config["FIRST_MESSAGE"])
-    db.session.add(new_memory)
+    test_memory = Memory(text=app.config["FIRST_MESSAGE"])
+    db.session.add(test_memory)
     db.session.commit()
 
 
@@ -357,7 +361,7 @@ def stream():
 
     """
 
-    return Response(event(), mimetype="text/event-stream")
+    return flask.Response(event(), mimetype="text/event-stream")
 
 
 @app.route('/')
@@ -370,15 +374,15 @@ def show_memories():
     memories = Memory.query.order_by(Memory.id.asc()).all()
     memories_for_jinja = [memory.to_dict() for memory in memories]
 
-    return render_template('show_memories.html',
-                           memories=memories_for_jinja)
+    return flask.render_template('show_memories.html',
+                                 memories=memories_for_jinja)
 
 
 @app.route('/new_memory', methods=['POST'])
 @limiter.limit("1/second")
 def new_memory():
     """Attempt to add a new memory.
-    
+
     Forget the 11th oldest memory.
 
     The memory must meet these requirements:
@@ -391,7 +395,7 @@ def new_memory():
 
     """
 
-    memory_text = request.form['text'].strip()
+    memory_text = flask.request.form['text'].strip()
 
     # memory must be at least 1 char
     if len(memory_text) == 0:
@@ -400,7 +404,7 @@ def new_memory():
 
     # commands
     slash_commands = [SlashLogin, SlashLogout, SlashDanbooru]
-    
+
     for slash_command in slash_commands:
         result = slash_command.attempt(memory_text)
 
@@ -416,7 +420,6 @@ def new_memory():
         elif result.to_database is False:
 
             return result.value
-        
 
     # memomry text may not exceed MAX_CHARACTERS
     if len(memory_text) > app.config['MAX_CHARACTERS']:
@@ -437,7 +440,7 @@ def new_memory():
     db.session.add(new_memory)
     db.session.commit()
 
-    return redirect(url_for('show_memories'))
+    return flask.redirect(flask.url_for('show_memories'))
 
 
 @app.route('/forget', methods=['POST'])
@@ -448,13 +451,13 @@ def forget():
 
     """
 
-    if not session.get('logged_in'):
-        abort(401)
+    if not flask.session.get('logged_in'):
+        flask.abort(401)
 
-    Memory.query.filter_by(id=request.form["id"]).delete()
+    Memory.query.filter_by(id=flask.request.form["id"]).delete()
     db.session.commit()
 
-    return redirect(url_for('show_memories'))
+    return flask.redirect(flask.url_for('show_memories'))
 
 
 if __name__ == '__main__':
