@@ -31,6 +31,7 @@ from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
 import glitch
+import audio
 
 
 monkey.patch_all()  # NOTE: totally cargo culting this one
@@ -61,8 +62,9 @@ class Memory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Unicode(140), unique=True)
     base64_image = db.Column(db.String(), unique=True)
+    base64_audio = db.Column(db.String(), unique=True)
 
-    def __init__(self, text, base64_image=None):
+    def __init__(self, text, base64_image=None, base64_audio=None):
         """
 
         Args:
@@ -82,6 +84,16 @@ class Memory(db.Model):
                 self.base64_image = glitch.glitch_from_url(text)
             else:
                 self.base64_image = None
+
+        if base64_audio:
+            self.base64_audio = base64_audio
+        else:
+            mimetype = mimetypes.guess_type(text)[0]
+
+            if mimetype and mimetype.startswith(u'audio'):
+                self.base64_audio = audio.glitch_audio(text)
+            else:
+                self.base64_audio = None
 
     def __repr__(self):
 
@@ -104,7 +116,8 @@ class Memory(db.Model):
         """
 
         return cls(text=memory_dict["text"],
-                   base64_image=memory_dict.get("base64_image"))
+                   base64_image=memory_dict.get("base64_image"),
+                   base64_audio=memory_dict.get("base64_audio"))
 
     def to_dict(self):
         """Return a dictionary representation of this Memory.
@@ -118,6 +131,7 @@ class Memory(db.Model):
 
         return {"text": self.text,
                 "base64_image": self.base64_image,
+                "base64_audio": self.base64_audio,
                 "id": self.id}
 
 
