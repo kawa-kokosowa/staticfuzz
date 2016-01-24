@@ -16,10 +16,10 @@ Options:
 
 """
 
-
 import mimetypes
 import random
 import json
+import os
 
 import flask
 import docopt
@@ -302,6 +302,12 @@ def ratelimit_handler(error):
     return app.config["ERROR_RATE_EXCEEDED"], 429
 
 
+def random_background():
+
+    return ("static/backgrounds/" +
+            random.choice(os.listdir("static/backgrounds/")))
+
+
 def init_db():
     """For use on command line for setting up
     the database.
@@ -461,6 +467,9 @@ def forget():
 
     return flask.redirect(flask.url_for('show_memories'))
 
+
+# NOTE: below is messy, i gotta figure out a way to clear this up...
+app.jinja_env.globals.update(random_background=random_background)
 
 # NOTE: this is all the way at the bottom so we can use init_db!
 if app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:":

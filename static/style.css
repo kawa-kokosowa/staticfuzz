@@ -21,8 +21,8 @@
 
 body {
   text-align: center;
-  background: linear-gradient( rgba(33, 33, 33, 0.98), rgba(33, 33, 33, 0.98) ),
-              url('bg-static.gif');
+  background: linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ),
+              url('background/bg-static.gif');
   background-color: #000;
   background-size: cover;
   background-position: center top;
