@@ -243,6 +243,7 @@ iframe {
   text-transform: uppercase;
   color: #e82b7a;
   position: fixed;
+  padding-top: 3rem;
     background: url('error.gif') no-repeat center center fixed #ff0000;
     background-size: cover;
     z-index: 10;
