@@ -226,7 +226,7 @@ class SlashLogin(SlashCommand):
 
         if secret_attempt == app.config['WHISPER_SECRET']:
             flask.session['logged_in'] = True
-            flash(app.config["GOD_GREET"])
+            flask.flash(app.config["GOD_GREET"])
             redirect = flask.redirect(flask.url_for('show_memories'))
 
             return SlashCommandResponse(False, redirect)
@@ -251,7 +251,7 @@ class SlashLogout(SlashCommand):
         """User who sent this will no longer be a god."""
 
         session.pop('logged_in', None)
-        flash(app.config["GOD_GOODBYE"])
+        flask.flash(app.config["GOD_GOODBYE"])
 
         return SlashCommandResponse(False, redirect(url_for('show_memories')))
 
