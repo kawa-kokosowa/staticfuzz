@@ -6,3 +6,4 @@ pillow
 docopt
 flask_sqlalchemy
 flask_limiter
+pytest-flask
