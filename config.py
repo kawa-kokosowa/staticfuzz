@@ -72,8 +72,6 @@ ERROR_UNORIGINAL = u"Unoriginal!"
 ERROR_RATE_EXCEEDED = u"Not so fast!"
 ERROR_DANBOORU = u"No matches!"
 
-# Random Backgrounds
-#
-# If enabled/set this will rotate the backgrounds
-# static/backgrounds
-RANDOM_BACKGROUNDS = True
+# Used for backgrounds right now! Path to directory
+# of images to rotate.
+RANDOM_IMAGE_DIRECTORY = "static/backgrounds/"

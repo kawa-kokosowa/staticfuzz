@@ -302,10 +302,15 @@ def ratelimit_handler(error):
     return app.config["ERROR_RATE_EXCEEDED"], 429
 
 
-def random_background():
-
-    return ("static/backgrounds/" +
-            random.choice(os.listdir("static/backgrounds/")))
+@app.route('/random_image', methods=['GET', 'POST'])
+@limiter.limit("2/second")
+def random_image():
+    # NOTE: should be a config var
+    image_directory = app.config["RANDOM_IMAGE_DIRECTORY"]
+    image_path = os.path.join(image_directory,
+                              random.choice(os.listdir(image_directory)))
+            
+    return flask.send_file(image_path, mimetypes.guess_type(image_path)[0])
 
 
 def init_db():
@@ -467,9 +472,6 @@ def forget():
 
     return flask.redirect(flask.url_for('show_memories'))
 
-
-# NOTE: below is messy, i gotta figure out a way to clear this up...
-app.jinja_env.globals.update(random_background=random_background)
 
 # NOTE: this is all the way at the bottom so we can use init_db!
 if app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:":

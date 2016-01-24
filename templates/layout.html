@@ -9,11 +9,7 @@
       <!--<link rel="stylesheet" href="http://basehold.it/48/ff0000">-->
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     </head>
-    {% if config.RANDOM_BACKGROUNDS %}
-    <body style="background-image: linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('{{ random_background() }}')!important;">
-    {% else %}
     <body>
-    {% endif %}
       <header>
         <h1><a href="/">STATICFUZZ</a></h1>
         <p>Text+ board; 10 anonymous memories&mdash;newest replaces oldest.</p>
