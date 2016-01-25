@@ -268,10 +268,11 @@ class SlashLogout(SlashCommand):
     def callback():
         """User who sent this will no longer be a god."""
 
-        session.pop('logged_in', None)
+        flask.session.pop('logged_in', None)
         flask.flash(app.config["GOD_GOODBYE"])
+        redirect = flask.redirect(flask.url_for('show_memories'))
 
-        return SlashCommandResponse(False, redirect(url_for('show_memories')))
+        return SlashCommandResponse(False, redirect)
 
 
 class SlashDanbooru(SlashCommand):
