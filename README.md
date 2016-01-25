@@ -1,5 +1,8 @@
 # STATICFUZZ
 
+[![Code Climate](https://img.shields.io/codeclimate/github/hypatia-software-org/staticfuzz.svg)]()
+[![Travis](https://img.shields.io/travis/hypatia-software-org/staticfuzz.svg)]()
+
 http://staticfuzz.com/
 
 A board for ten anonymous memories. Each new memory replaces the oldest. 
@@ -17,6 +20,7 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
 ## Running
 
   1. `pip install -r requirements.txt`
+  2. `cp config-example.py config.py`
   2. `python staticfuzz.py serve`
 
 Then you open http://localhost:5000/ in a web browser.
