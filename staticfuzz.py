@@ -410,6 +410,31 @@ def show_memories():
                                  memories=memories_for_jinja)
 
 
+def validate(memory_text):
+    """Return None if validation successful, else
+    return 400 + status message.
+
+    """
+
+    # memory must be at least 1 char
+    if len(memory_text) == 0:
+
+        return u"Too short!", 400
+
+    # memomry text may not exceed MAX_CHARACTERS
+    if len(memory_text) > app.config['MAX_CHARACTERS']:
+
+        return app.config["ERROR_TOO_LONG"], 400
+
+    # you cannot repost something already in the memories
+    if Memory.query.filter_by(text=memory_text).all():
+
+        return app.config["ERROR_UNORIGINAL"], 400
+
+    # success!
+    return None
+
+
 @app.route('/new_memory', methods=['POST'])
 @limiter.limit("1/second")
 def new_memory():
@@ -428,11 +453,11 @@ def new_memory():
     """
 
     memory_text = flask.request.form['text'].strip()
+    validation_payload = validate(memory_text)
 
-    # memory must be at least 1 char
-    if len(memory_text) == 0:
+    if validation_payload:
 
-        return u"Too short!", 400
+        return validation_payload
 
     # commands
     slash_commands = [SlashLogin, SlashLogout, SlashDanbooru]
@@ -452,16 +477,6 @@ def new_memory():
         elif result.to_database is False:
 
             return result.value
-
-    # memomry text may not exceed MAX_CHARACTERS
-    if len(memory_text) > app.config['MAX_CHARACTERS']:
-
-        return app.config["ERROR_TOO_LONG"], 400
-
-    # you cannot repost something already in the memories
-    if Memory.query.filter_by(text=memory_text).all():
-
-        return app.config["ERROR_UNORIGINAL"], 400
 
     # if ten entries in db, delete oldest to make room for new
     if Memory.query.count() == 10:
