@@ -23,7 +23,7 @@ def glitch_audio(url_string):
     sound = pydub.AudioSegment.from_file(urlopen_result_io, format="wav")
 
     # Glitch
-    for n in range(1, 4):
+    for n in range(1, 6):
         ms = random.randint(500, 1000)
 
         end_start = random.randint(ms, len(sound) - ms)
