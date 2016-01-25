@@ -88,9 +88,11 @@ class Memory(db.Model):
         if base64_audio:
             self.base64_audio = base64_audio
         else:
-            mimetype = mimetypes.guess_type(text)[0]
+            # mimetype is inconsistent for ogg so we do this monster
+            supported_extensions = (".ogg",)  # just for now
+            if ((text.startswith("http://") or text.startswith("https://")) and
+                    text[-4:] in supported_extensions):
 
-            if mimetype and mimetype.startswith(u'audio'):
                 self.base64_audio = audio.glitch_audio(text)
             else:
                 self.base64_audio = None
@@ -107,7 +109,8 @@ class Memory(db.Model):
             memory_dict (dict): Keys are the fields for
                 a memory. It looks like this:
 
-                >>> {'text': "foo", "base64_image": None}
+                >>> {'text': "foo", "base64_image": None,
+                ...  "base64_audio": None}
 
         Returns:
             Memory: Created from a dictionary, for you to
@@ -125,7 +128,8 @@ class Memory(db.Model):
         Returns:
             dict: Looks something like this:
 
-                >>> {'text': "foo", "base64_image": None}
+                >>> {'text': "foo", "base64_image": None,
+                ...  "base64_audio": None}
 
         """
 
