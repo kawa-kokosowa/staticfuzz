@@ -20,7 +20,7 @@ def glitch_audio(url_string):
     urlopen_result = urllib2.urlopen(req)
     urlopen_result_io = io.BytesIO(urlopen_result.read())
 
-    sound = pydub.AudioSegment.from_file(urlopen_result_io, format="wav")
+    sound = pydub.AudioSegment.from_wav(urlopen_result_io)
 
     # Glitch
     for n in range(1, 6):
