@@ -88,10 +88,10 @@ class Memory(db.Model):
         if base64_audio:
             self.base64_audio = base64_audio
         else:
-            # mimetype is inconsistent for ogg so we do this monster
-            supported_extensions = (".ogg",)  # just for now
+
+            # mimetype is inconsistent for wav so we do this monster
             if ((text.startswith("http://") or text.startswith("https://")) and
-                    text[-4:] in supported_extensions):
+                text[-4:] == ".wav"):
 
                 self.base64_audio = audio.glitch_audio(text)
             else:
