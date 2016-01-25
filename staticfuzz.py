@@ -315,11 +315,17 @@ def uri_file_type(uri):
     image_extension_whitelist = (".jpg", ".jpeg", ".png", ".gif")
     audio_extension_whitelist = (".wav",)
 
-    if not (uri.startswith("http://") or uri.startswith("https://")):
+    # actually fetch the resource to see if it's real or not
+    try:
+        request = requests.get(uri)
+        assert request.status_code == 200
+    except (requests.exceptions.MissingSchema,
+            requests.exceptions.ConnectionError,
+            AssertionError):
 
         return None
 
-    elif uri.endswith(image_extension_whitelist):
+    if uri.endswith(image_extension_whitelist):
 
         return 'image'
 
