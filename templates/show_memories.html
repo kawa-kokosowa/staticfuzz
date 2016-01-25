@@ -11,7 +11,7 @@
         </a>
         {% elif memory.base64_audio %}
         <audio controls>
-            <source src="data:audio/ogg;base64,{{ memory.base64_audio }}">
+            <source src="data:audio/wav;base64,{{ memory.base64_audio }}">
             {{ memory.text}}
         </audio>
         {% else %}

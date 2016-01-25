@@ -154,7 +154,7 @@
                         article.append(link);
                     } else if (memory.base64_audio) {
                       var audio = jQuery("<audio controls>");
-                      audio.attr("src", "data:audio/ogg;base64," + memory.base64_audio);
+                      audio.attr("src", "data:audio/wav;base64," + memory.base64_audio);
                       article.append(audio);
                     } else {  // regular memory
                         article.text(memory.text);
