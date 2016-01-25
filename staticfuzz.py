@@ -73,29 +73,22 @@ class Memory(db.Model):
         """
 
         self.text = text
+        self.base64_image = None
+        self.base64_audio = None
+
+        # is text a URI to an image or audio?
+        file_type = uri_file_type(text)
 
         # if it's URI to image let's download it glitch it up and store as base64
         if base64_image:
             self.base64_image = base64_image
-        else:
-            mimetype = mimetypes.guess_type(text)[0]
-
-            if mimetype and mimetype.startswith(u'image'):
-                self.base64_image = glitch.glitch_from_url(text)
-            else:
-                self.base64_image = None
+        elif file_type == "image":
+            self.base64_image = glitch.glitch_from_url(text)
 
         if base64_audio:
             self.base64_audio = base64_audio
-        else:
-
-            # mimetype is inconsistent for wav so we do this monster
-            if ((text.startswith("http://") or text.startswith("https://")) and
-                text[-4:] == ".wav"):
-
-                self.base64_audio = audio.glitch_audio(text)
-            else:
-                self.base64_audio = None
+        elif file_type == "audio":
+            self.base64_audio = audio.glitch_audio(text)
 
     def __repr__(self):
 
@@ -307,6 +300,36 @@ class SlashDanbooru(SlashCommand):
             # There were no results!
             return SlashCommandResponse(False,
                                         (app.config["ERROR_DANBOORU"], 400))
+
+
+def uri_file_type(uri):
+    """See if URI is a valid file allowed
+    by the whitelist.
+
+    Returns:
+        None|"audio"|"video": Returns None if URI is invalid or
+            unsupported/unknown.
+
+    """
+
+    image_extension_whitelist = (".jpg", ".jpeg", ".png", ".gif")
+    audio_extension_whitelist = (".wav",)
+
+    if not (uri.startswith("http://") or uri.startswith("https://")):
+
+        return None
+
+    elif uri.endswith(image_extension_whitelist):
+
+        return 'image'
+
+    elif uri.endswith(audio_extension_whitelist):
+
+        return 'audio'
+
+    else:  # URI is valid, but type unknown
+
+        return None
 
 
 @app.errorhandler(429)
