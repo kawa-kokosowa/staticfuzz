@@ -66,6 +66,14 @@ number of arguments, something like `def callback(only_one):` works!
   * `/danbooru search some tags`: Get a random image from
     [Danbooru](http://danbooru.donmai.us/) which matches the supplied tags.
 
+## Other features
+
+  * Images: post a link to an image.
+  * Audio: post a link to a `.wav` audio file.
+
+Both images and audio are stylistically randomly glitched, but you can
+have audio and images handled however you want!
+
 ## Built with love
 
 Free for commercial or any purpose (MIT license).
