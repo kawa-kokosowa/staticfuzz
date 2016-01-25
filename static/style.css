@@ -10,8 +10,6 @@
  *   - Black: #212121
  */
 
-@import url(https://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700,700italic,400italic);
-
 * {
   margin: 0;
   padding: 0;
@@ -45,7 +43,6 @@ body::after {
     bottom: 0;
     right: 0;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 2;
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
     width: 100vw;
@@ -67,11 +64,8 @@ header p + p {
   font-size: 0.75rem;
 }
 
-h1, h2 {
-  color: #fff430;
-}
-
 h1 {
+  color: #fff430;
   font-size: 3rem;
   line-height: 3rem;
 }
@@ -83,6 +77,7 @@ h1 a:visited {
 }
 
 h2 {
+  color: #fff430;
   font-size: 138.2%;
   line-height: 1.5rem;
   margin-top: 1.5rem;
@@ -117,9 +112,6 @@ h2 {
   line-height: 3rem;
 }
 
-#memories li + li {
-}
-
 .memory {
     display: inline-block;
 }
@@ -137,7 +129,7 @@ footer {
 @keyframes fuzz {
   0%  {opacity: 1; left: 0;}
   50% {opacity: 0.98; left: 1px;}
-  100% {opacity: 1; left: 0px;}
+  100% {opacity: 1; left: 0;}
 }
 
 li:nth-child(1) {
@@ -188,9 +180,12 @@ input[type=text] {
   background-size: 100% 100%;
   color: #d0ddd2;
   border: none;
-  outline: none;
   text-align: center;
   max-width: 100%;
+}
+
+input[type=text]:focus {
+  outline: none;
 }
 
 ol li form {
@@ -269,6 +264,7 @@ iframe {
 
   html, body {
       background: rgba(33, 33, 33, 1);
+      background-color: #000;
   }
 
   body {
