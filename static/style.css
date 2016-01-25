@@ -134,18 +134,26 @@ footer {
 
 li:nth-child(1) {
   opacity: 0.10;
+  -webkit-filter: blur(3px) grayscale(90%);
+  filter: blur(3px) grayscale(90%);
 }
 
 li:nth-child(2) {
   opacity: 0.20;
+  -webkit-filter: blur(2px) grayscale(80%);
+  filter: blur(2px) grayscale(80%);
 }
 
 li:nth-child(3) {
   opacity: 0.30;
+  -webkit-filter: blur(1px) grayscale(70%);
+  filter: blur(1px) grayscale(70%);
 }
 
 li:nth-child(4) {
   opacity: 0.40;
+  -webkit-filter: grayscale(60%);
+  filter: grayscale(60%);
 }
 
 li:nth-child(5) {
@@ -182,10 +190,16 @@ input[type=text] {
   border: none;
   text-align: center;
   max-width: 100%;
+  opacity: 0.7;
+  -webkit-filter: blur(5px) grayscale(20%);
+  filter: blur(5px) grayscale(20%);
 }
 
 input[type=text]:focus {
   outline: none;
+  opacity: 1;
+  -webkit-filter: none;
+  filter: none;
 }
 
 ol li form {

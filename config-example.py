@@ -75,3 +75,5 @@ ERROR_DANBOORU = u"No matches!"
 # Used for backgrounds right now! Path to directory
 # of images to rotate.
 RANDOM_IMAGE_DIRECTORY = "static/backgrounds/"
+
+PLACEHOLDER = "tell me a memory"
