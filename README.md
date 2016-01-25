@@ -17,7 +17,6 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
 ## Running
 
   1. `pip install -r requirements.txt`
-  2. `python staticfuzz.py initdb`
   2. `python staticfuzz.py serve`
 
 Then you open http://localhost:5000/ in a web browser.
