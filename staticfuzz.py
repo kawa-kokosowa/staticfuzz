@@ -170,23 +170,25 @@ class SlashCommand(object):
 
         """
 
-        pattern = u"/" + cls.NAME
+        text = text.lower()
+        pattern = "/" + cls.NAME
 
-        if text.startswith(pattern + u" ") or text == pattern:
-            text = text.replace(pattern, u"")
-            args = [arg.strip() for arg in text.split(" ") if arg.strip()]
-
-            try:
-
-                return cls.callback(*args)
-
-            except TypeError:
-
-                return SlashCommandResponse(False, (u"%s incorrect args" % cls.NAME, 400))
-
-        else:
+        if not (text.startswith(pattern + " ") or
+                text == pattern):
 
             return None
+
+        text = text.replace(pattern, u"")
+        args = [arg.strip() for arg in text.split(" ") if arg.strip()]
+
+        try:
+
+            return cls.callback(*args)
+
+        except TypeError:
+
+            return SlashCommandResponse(False, ("%s incorrect args" %
+                                                cls.NAME, 400))
 
     @staticmethod
     def callback(*args):
@@ -307,7 +309,7 @@ def uri_valid_image(uri):
             requests.exceptions.ConnectionError,
             AssertionError):
 
-        return None
+        return False
 
     return uri.endswith(image_extension_whitelist)
 
@@ -456,6 +458,7 @@ def new_memory():
     """
 
     memory_text = flask.request.form['text'].strip()
+    original_memory_text = memory_text
     validation_payload = validate(memory_text)
 
     if validation_payload:
@@ -481,7 +484,20 @@ def new_memory():
 
             return result.value
 
-    # if ten entries in db, delete oldest to make room for new
+    # We do not want to submit anything that didn't execute
+    # a slash command, but starts with a slash! This is in
+    # case of an event like "/logni password", so it's not
+    # broadcasted to the entire world.
+    #
+    # At this point, either we have made a change to the
+    # database and return'd out, or we modified the memory
+    # text, in which it'll differ from original_memory.
+    if memory_text[0] == '/' and memory_text == original_memory_text:
+
+        return "Invalid Slash Command", 400
+
+    # If there are ten memories already, delete the oldest
+    # to make room!
     if Memory.query.count() == 10:
         memory_to_delete = Memory.query.order_by(Memory.id.asc()).first()
         db.session.delete(memory_to_delete)
