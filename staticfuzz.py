@@ -44,7 +44,6 @@ limiter = Limiter(app)
 db = SQLAlchemy(app)
 
 
-
 class Memory(db.Model):
     """SQLAlchemy/database abstraction of a memory.
 
@@ -319,6 +318,7 @@ def uri_file_type(uri):
     try:
         request = requests.get(uri)
         assert request.status_code == 200
+
     except (requests.exceptions.MissingSchema,
             requests.exceptions.ConnectionError,
             AssertionError):
