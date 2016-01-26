@@ -1,22 +1,24 @@
-# STATICFUZZ
+# staticfuzz
 
 [![Travis](https://img.shields.io/travis/hypatia-software-org/staticfuzz.svg?style=flat-square)](https://travis-ci.org/hypatia-software-org/staticfuzz)
 [![Code Climate](https://img.shields.io/codeclimate/github/hypatia-software-org/staticfuzz.svg?style=flat-square)](https://codeclimate.com/github/hypatia-software-org/staticfuzz)
 
-http://staticfuzz.com/
+See it live: http://staticfuzz.com/
 
-A board for ten anonymous memories. Each new memory replaces the oldest. 
+Memories which vanish.
+
+In the spirit of early anonymous text/imageboards.
+
+Ten memories; new memories shown live and bump off the oldest into oblivion.
 
 ## Why use?
 
-  * Efficient: asynchronous, server sent event (SEE/EventSource)
-  * Easy to configure: `config.py`
-  * Great notification system
-  * Easy to extend, add commands
-  * Nothing is ever written to disk! If you want, STATICFUZZ *can*
-    use just about any database system. All user data is temporary
-    text; image thumbnails are base64 and link to their original
-    (external) source.
+  * Memories only ever exist in memory (RAM)
+  * Memories streamed live, asynchronously, with server-sent events
+  * Easy to configure
+  * Notification system
+  * Easy-to-create "slash comamnds"
+  * Miscellaneous mood settings (e.g., random backgrounds)
 
 ## Running
 
@@ -52,12 +54,13 @@ class Sum(SlashCommand):
         return SlashCommandResponse(True, sum(args))
 ```
 
-The above saves the sum of arguments to the database. The first arg of
-`SlashCommandResponse` is a `bool`: if `True`, the result is saved to
-the database, otherwise it's sent to the visitor as a response. If any
-of the supplied arguments aren't a number, response is HTTP error 400.
-If you supply `/sum 1 2 3` it will write `6` to the database. If you
-input `/sum a b c` a 400 will be served.
+Above will create a memory which text is the sum of the arguments, e.g.,
+`/sum 1 2 3` would create a memory with the text `6`. If the user enters
+something like `/sum 1 a 3` an HTTP error 400 is sent.
+
+The first argument of `SlashCommandResponse` is a `bool`, if `True` it will
+create a memory with the second argument, otherwise, the second arugment is
+sent as a response.
 
 `callback()` does not need to take any arguments at all. It can take any
 number of arguments, something like `def callback(only_one):` works!

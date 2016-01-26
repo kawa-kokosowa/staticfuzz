@@ -10,6 +10,9 @@
 # Use sqlite memory database (never touches disk):
 SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
+# Port to listen on when serving
+PORT = 5000
+
 DEBUG = True
 SECRET_KEY = 'BETTER CHANGE ME'
 
@@ -76,4 +79,6 @@ ERROR_DANBOORU = u"No matches!"
 # of images to rotate.
 RANDOM_IMAGE_DIRECTORY = "static/backgrounds/"
 
+# This is the placeholder used in the memory diamond
+# (text input) for submitting memories.
 PLACEHOLDER = "tell me a memory"

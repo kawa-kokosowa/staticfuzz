@@ -1,4 +1,6 @@
-"""staticfuzz: async SSE transient textboard
+"""staticfuzz: memories that vanish.
+
+Async server-sent event (SSE) text+board.
 
 If this script is invoked directly, it can be used
 as a CLI for managing staticfuzz.
@@ -127,41 +129,52 @@ class Memory(db.Model):
 class SlashCommandResponse(object):
     """All SlashCommand.callback() methods must return this.
 
+    Attributes:
+        create_memory (bool): If True create a memory using
+            value attribute. Otherwise serve value as a
+            response.
+        value (tuple[str, int]|str): Either a tuple which
+            holds a status message and an HTTP error code,
+            or a string to create a memory. Example values:
+
+                >>> "some memory text"
+                >>> ("Bad ID", 400)
+
     See Also:
         SlashCommand
 
     """
 
-    def __init__(self, to_database, value):
+    def __init__(self, create_memory, value):
         """The result of a slash command.
 
         Args:
-            to_database (bool): If True the response is
-                carried to the database, otherwise it
-                is returned to the enduser.
-            value (any): Any data returned from the slash
-                command.
+            create_memory (bool): If True the value will be
+                used to create a memory. If False value will be
+                sent as a response, e.g., "Invalid URI," 400.
+            value (any): A string to be used for creating a
+                memory, or a response to be sent like:
+
+                >>> ("Invalid Shipping Address", 400)
+
+        Examples:
+
+            >>> SlashCommandResponse(False, ("Bad thing!", 400))
+            >>> SlashCommandResponse(True, "some kinda memory text")
 
         """
 
-        self.to_database = to_database
+        self.create_memory = create_memory
         self.value = value
 
 
 class SlashCommand(object):
-    """/something to be executed instead of posted.
+    """IRC-like command; a more complicated memory.
 
-    When a piece of text is sent, it is compared against
-    all SlashCommands to possibly trigger those commands.
-
-    The callback() static method must return a boolean as
-    the first index value of the result, e.g.:
-
-    >>> add(1, 1,)
-    True, 2
-
-    The boolean represents if we return out (drop return
-    to page).
+    When input text is received, it is also sent to each
+    slash command's attempt() method. The first attempt
+    to return a SlashCommandResponse gets used either to
+    create a memory or serve a response (like a 400).
 
     """
 
@@ -194,6 +207,9 @@ class SlashCommand(object):
 
             return cls.callback(*args)
 
+        # NOTE: what if typeerror is raised because of something
+        # in the callback. Seems like a bad approach... could
+        # cause debugging headaches.
         except TypeError:
 
             return SlashCommandResponse(False, ("%s incorrect args" %
@@ -203,6 +219,9 @@ class SlashCommand(object):
     def callback(*args):
         """Ovverride this with another staticmethod; do something
         with the args, return a SlashCommandResponse.
+
+        Use any number of args you please (including 0) or *args
+        (variable length).
 
         """
 
@@ -215,23 +234,32 @@ class SlashLogin(SlashCommand):
     Note:
         You have to refresh the page for this to work.
 
+    See Also:
+        SlashLogout
+
     """
 
     NAME = u"login"
 
     @staticmethod
     def callback(secret_attempt):
-        """Attempt to use secret_attempt to login.
+        """Attempt to use secret_attempt to identify as a deity.
 
         Args:
             secret_attempt (str): Password/whisper secret
-                being attempted.
+                being attempted. If the secret corresponds
+                to the one set in the config file, the
+                session's "deity" key is set to True.
+
+        Returns:
+            SlashCommandResponse: Either a login failure 401, or
+                redirect to the show_memories page after success.
 
         """
 
         if secret_attempt == app.config['WHISPER_SECRET']:
-            flask.session['logged_in'] = True
-            flask.flash(app.config["GOD_GREET"])
+            flask.session['deity'] = True
+            flask.flash(app.config["DEITY_GREET"])
             redirect = flask.redirect(flask.url_for('show_memories'))
 
             return SlashCommandResponse(False, redirect)
@@ -253,9 +281,14 @@ class SlashLogout(SlashCommand):
 
     @staticmethod
     def callback():
-        """User who sent this will no longer be a deity."""
+        """User who sent this will no longer be a deity.
 
-        flask.session.pop('logged_in', None)
+        Returns:
+            SlashCommandResponse: redirect to show_memories.
+
+        """
+
+        flask.session.pop('deity', None)
         flask.flash(app.config["GOD_GOODBYE"])
         redirect = flask.redirect(flask.url_for('show_memories'))
 
@@ -263,7 +296,11 @@ class SlashLogout(SlashCommand):
 
 
 class SlashDanbooru(SlashCommand):
-    """Get a random image from Danbooru from tags.
+    """Get a random image from the first page of a search
+    for specific tags on danbooru.donmai.us.
+
+    See Also:
+        http://danbooru.donmai.us/wiki_pages/43568 
 
     """
 
@@ -271,16 +308,22 @@ class SlashDanbooru(SlashCommand):
 
     @staticmethod
     def callback(*args):
-        """
+        """Each arg is a Danbooru tag.
 
         Args:
           *args (list[str]): Each element is a string/tag
             to search for, e.g., "goo_girl"
 
+        Returns:
+            SlashCommandResponse: Either the random image found,
+                or a 400 for whatever error encountered while
+                attempting to get a random image.
+
         """
 
         tags = "%20".join(args)
-        endpoint = ('http://danbooru.donmai.us/posts.json?tags=%s&limit=10&page1' % tags)
+        endpoint = ('http://danbooru.donmai.us/posts.json?'
+                    'tags=%s&limit=10&page1' % tags)
         results = requests.get(endpoint).json()
 
         try:
@@ -483,14 +526,15 @@ def new_memory():
 
         if result is None:
 
+            # only happens if it is a non-match
             continue
 
-        elif result.to_database is True:
+        elif result.create_memory is True:
             memory_text = result.value
 
             break
 
-        elif result.to_database is False:
+        elif result.create_memory is False:
 
             return result.value
 
@@ -525,9 +569,13 @@ def forget():
 
     Delete a memory.
 
+    Returns:
+        flask redirect to show_memories or send a 401
+            unauthorized HTTP error.
+
     """
 
-    if not flask.session.get('logged_in'):
+    if not flask.session.get('deity'):
         flask.abort(401)
 
     Memory.query.filter_by(id=flask.request.form["id"]).delete()
@@ -550,4 +598,4 @@ if __name__ == '__main__':
         init_db()
 
     if arguments["serve"]:
-        WSGIServer(('', 5000), app).serve_forever()
+        WSGIServer(('', app.config["PORT"]), app).serve_forever()
