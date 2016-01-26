@@ -201,7 +201,7 @@ class SlashCommand(object):
 
 
 class SlashLogin(SlashCommand):
-    """Login as god if the secret is correct.
+    """Login as deity if the secret is correct.
 
     Note:
         You have to refresh the page for this to work.
@@ -233,7 +233,7 @@ class SlashLogin(SlashCommand):
 
 
 class SlashLogout(SlashCommand):
-    """Stop being god.
+    """Stop being a deity.
 
     Note:
         You have to refresh the page for this to work.
@@ -244,7 +244,7 @@ class SlashLogout(SlashCommand):
 
     @staticmethod
     def callback():
-        """User who sent this will no longer be a god."""
+        """User who sent this will no longer be a deity."""
 
         flask.session.pop('logged_in', None)
         flask.flash(app.config["GOD_GOODBYE"])
@@ -512,7 +512,7 @@ def new_memory():
 
 @app.route('/forget', methods=['POST'])
 def forget():
-    """Goddess can make us all forget.
+    """Deities can make us all forget.
 
     Delete a memory.
 

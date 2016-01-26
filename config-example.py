@@ -62,9 +62,9 @@ ERROR_SOUND = '/static/error.ogg'
 
 # Localization, Text, Messages
 # A bunch of string values.
-GOD_GREET = "Make everyone forget"
+DEITY_GREET = "Make everyone forget"
 LOGIN_FAIL = "I don't think so."  # this should probably be ERROR_
-GOD_GOODBYE = "Memory is your mistress."
+DEITY_GOODBYE = "Memory is your mistress."
 
 # Error messages
 ERROR_TOO_LONG = u"Too long!"

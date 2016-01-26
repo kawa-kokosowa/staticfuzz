@@ -158,16 +158,16 @@
                     }
 
                     {% if session.logged_in %}
-                        var god_delete_form = jQuery("<form />");
-                        god_delete_form.attr("action", "{{ url_for("forget") }}");
-                        god_delete_form.attr("method", "post");
+                        var deity_delete_form = jQuery("<form />");
+                        deity_delete_form.attr("action", "{{ url_for("forget") }}");
+                        deity_delete_form.attr("method", "post");
 
                         var hidden_id = jQuery("<input />");
-                        god_delete_form.attr("type", "hidden");
-                        god_delete_form.attr("value", "");
-                        god_delete_form.append('<input type="hidden" name="id" value='+memory.id+'>');
-                        god_delete_form.append('<input type="submit" value="Forget">');
-                        article.append(god_delete_form);
+                        deity_delete_form.attr("type", "hidden");
+                        deity_delete_form.attr("value", "");
+                        deity_delete_form.append('<input type="hidden" name="id" value='+memory.id+'>');
+                        deity_delete_form.append('<input type="submit" value="Forget">');
+                        article.append(deity_delete_form);
                     {% endif %}
 
                     new_li.append(article);
