@@ -305,7 +305,8 @@ def uri_valid_image(uri):
         request = requests.get(uri)
         assert request.status_code == 200
 
-    except (requests.exceptions.MissingSchema,
+    except (requests.exceptions.InvalidSchema,
+            requests.exceptions.MissingSchema,
             requests.exceptions.ConnectionError,
             AssertionError):
 
@@ -511,7 +512,7 @@ def new_memory():
 
 @app.route('/forget', methods=['POST'])
 def forget():
-    """God can make us all forget.
+    """Goddess can make us all forget.
 
     Delete a memory.
 
