@@ -46,13 +46,15 @@ db = SQLAlchemy(app)
 class Memory(db.Model):
     """SQLAlchemy/database abstraction of a memory.
 
-    Fields:
-        id: The unique identifier for this memory.
-        text: String, the text of the memory, the
+    Memories are aptly kept in the "memories" table.
+
+    Fields/attributes:
+        id (int): Unique identifier, never resets.
+        text (str): String, the text of the memory, the
             memory itself.
-        base64_image: if `text` is a URI to an image,
+        base64_image str): if `text` is a URI to an image,
             then this is the base64 encoding of said
-            image.
+            image. Used as thumbnail.
 
     """
 
@@ -62,10 +64,17 @@ class Memory(db.Model):
     base64_image = db.Column(db.String())
 
     def __init__(self, text, base64_image=None):
-        """
+        """Create a new memory with text and optionally base64
+        representation of the image content found at the URI in
+        the text argument.
 
         Args:
-            text (str): Hopefully a valid URI to an image.
+            text (str): This is required for all memories. If this
+                is a link to an image, a base64_image thumbnail will
+                be generated for said image.
+            base64_image (str): Base 64 thumbnail for an image linked
+                in the text field. This field is used for base64 encoded
+                data URI (image src for thumbnails).
 
         """
 
