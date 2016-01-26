@@ -15,7 +15,8 @@ A board for ten anonymous memories. Each new memory replaces the oldest.
   * Easy to extend, add commands
   * Nothing is ever written to disk! If you want, STATICFUZZ *can*
     use just about any database system. All user data is temporary
-    text, or base64 representations of images and sounds.
+    text; image thumbnails are base64 and link to their original
+    (external) source.
 
 ## Running
 
