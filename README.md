@@ -11,7 +11,8 @@ early anonymous message boards, like http://www.2ch.net/ and
 
 ## Why use?
 
-  * Memories only ever exist in memory (RAM), but can easily be configured to use a persistent database
+  * Memories only ever exist in memory (RAM)
+  * Optionally, you can easily use a persistent database
   * Memories streamed live, asynchronously, with server-sent events
   * Easy to configure
   * Notification system
