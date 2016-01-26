@@ -311,7 +311,7 @@ def uri_valid_image(uri):
 
         return False
 
-    return uri.endswith(image_extension_whitelist)
+    return uri.lower().endswith(image_extension_whitelist)
 
 
 @app.errorhandler(429)
