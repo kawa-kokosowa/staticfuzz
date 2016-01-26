@@ -5,11 +5,9 @@
 
 See it live: http://staticfuzz.com/
 
-Memories which vanish.
-
-In the spirit of early anonymous text/imageboards.
-
-Ten memories; new memories shown live and bump off the oldest into oblivion.
+Memories which vanish. Live message board, in the spirit of
+early anonymous message boards, like http://www.2ch.net/ and
+[Kareha](https://wakaba.c3.cx/s/web/wakaba_kareha).
 
 ## Why use?
 
