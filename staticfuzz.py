@@ -170,7 +170,7 @@ class SlashCommand(object):
 
         """
 
-        text = text.lower()
+        text = text.lower().strip()
         pattern = "/" + cls.NAME
 
         if not (text.startswith(pattern + " ") or
