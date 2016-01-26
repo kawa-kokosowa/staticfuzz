@@ -11,12 +11,13 @@ early anonymous message boards, like http://www.2ch.net/ and
 
 ## Why use?
 
-  * Memories only ever exist in memory (RAM)
+  * Memories only ever exist in memory (RAM), but can easily be configured to use a persistent database
   * Memories streamed live, asynchronously, with server-sent events
   * Easy to configure
   * Notification system
   * Easy-to-create "slash comamnds"
   * Miscellaneous mood settings (e.g., random backgrounds)
+  * Easily config
 
 ## Running
 
