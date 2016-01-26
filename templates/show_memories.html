@@ -9,11 +9,6 @@
         <a href="{{ memory.text }}">
           <img src="data:image/png;base64,{{ memory.base64_image }}" alt="{{ memory.id }}">
         </a>
-        {% elif memory.base64_audio %}
-        <audio controls>
-            <source src="data:audio/wav;base64,{{ memory.base64_audio }}">
-            {{ memory.text}}
-        </audio>
         {% else %}
         {{ memory.text}}
         {% endif %}

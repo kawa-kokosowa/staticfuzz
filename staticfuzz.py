@@ -31,7 +31,6 @@ from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
 import glitch
-import audio
 
 
 monkey.patch_all()  # NOTE: totally cargo culting this one
@@ -60,10 +59,9 @@ class Memory(db.Model):
     __tablename__ = "memories"
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Unicode(140), unique=True)
-    base64_image = db.Column(db.String(), unique=True)
-    base64_audio = db.Column(db.String(), unique=True)
+    base64_image = db.Column(db.String())
 
-    def __init__(self, text, base64_image=None, base64_audio=None):
+    def __init__(self, text, base64_image=None):
         """
 
         Args:
@@ -73,21 +71,11 @@ class Memory(db.Model):
 
         self.text = text
         self.base64_image = None
-        self.base64_audio = None
 
-        # is text a URI to an image or audio?
-        file_type = uri_file_type(text)
-
-        # if it's URI to image let's download it glitch it up and store as base64
         if base64_image:
             self.base64_image = base64_image
-        elif file_type == "image":
+        elif uri_valid_image(text):  # valid uri to image?
             self.base64_image = glitch.glitch_from_url(text)
-
-        if base64_audio:
-            self.base64_audio = base64_audio
-        elif file_type == "audio":
-            self.base64_audio = audio.glitch_audio(text)
 
     def __repr__(self):
 
@@ -101,8 +89,7 @@ class Memory(db.Model):
             memory_dict (dict): Keys are the fields for
                 a memory. It looks like this:
 
-                >>> {'text': "foo", "base64_image": None,
-                ...  "base64_audio": None}
+                >>> {'text': "foo", "base64_image": None}
 
         Returns:
             Memory: Created from a dictionary, for you to
@@ -111,8 +98,7 @@ class Memory(db.Model):
         """
 
         return cls(text=memory_dict["text"],
-                   base64_image=memory_dict.get("base64_image"),
-                   base64_audio=memory_dict.get("base64_audio"))
+                   base64_image=memory_dict.get("base64_image"))
 
     def to_dict(self):
         """Return a dictionary representation of this Memory.
@@ -120,14 +106,12 @@ class Memory(db.Model):
         Returns:
             dict: Looks something like this:
 
-                >>> {'text': "foo", "base64_image": None,
-                ...  "base64_audio": None}
+                >>> {'text': "foo", "base64_image": None}
 
         """
 
         return {"text": self.text,
                 "base64_image": self.base64_image,
-                "base64_audio": self.base64_audio,
                 "id": self.id}
 
 
@@ -301,18 +285,18 @@ class SlashDanbooru(SlashCommand):
                                         (app.config["ERROR_DANBOORU"], 400))
 
 
-def uri_file_type(uri):
-    """See if URI is a valid file allowed
-    by the whitelist.
+def uri_valid_image(uri):
+    """Check if provided `uri` is a valid URI to
+    an image, as allowed by the extension whitelist.
 
     Returns:
-        None|"audio"|"video": Returns None if URI is invalid or
-            unsupported/unknown.
+        bool: True if `uri` is both an accessible
+            URI without any errors *and* the file
+            extension is in the whitelist.
 
     """
 
     image_extension_whitelist = (".jpg", ".jpeg", ".png", ".gif")
-    audio_extension_whitelist = (".wav",)
 
     # actually fetch the resource to see if it's real or not
     try:
@@ -325,17 +309,7 @@ def uri_file_type(uri):
 
         return None
 
-    if uri.endswith(image_extension_whitelist):
-
-        return 'image'
-
-    elif uri.endswith(audio_extension_whitelist):
-
-        return 'audio'
-
-    else:  # URI is valid, but type unknown
-
-        return None
+    return uri.endswith(image_extension_whitelist)
 
 
 @app.errorhandler(429)
