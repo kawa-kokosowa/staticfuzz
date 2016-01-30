@@ -16,7 +16,7 @@ early anonymous message boards, like http://www.2ch.net/ and
   * Memories streamed live, asynchronously, with server-sent events
   * Easy to configure
   * Notification system
-  * Easy-to-create "slash comamnds"
+  * Easy-to-create "slash commands"
   * Miscellaneous mood settings (e.g., random backgrounds)
   * Easily config
 
