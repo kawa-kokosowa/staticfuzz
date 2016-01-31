@@ -270,7 +270,7 @@ class SlashLogout(SlashCommand):
         """
 
         flask.session.pop('deity', None)
-        flask.flash(app.config["GOD_GOODBYE"])
+        flask.flash(app.config["DEITY_GOODBYE"])
         redirect = flask.redirect(flask.url_for('show_memories'))
 
         return SlashCommandResponse(False, redirect)
