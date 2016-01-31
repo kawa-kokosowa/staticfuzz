@@ -154,7 +154,11 @@
                         link.append(image);
                         article.append(link);
                     } else {  // regular memory
-                        article.text(memory.text);
+                        var blockquote = jQuery('<blockquote>');
+                        blockquote.text(memory.text);
+                        article.append(blockquote);
+                        var filtered = article.html().replace(/#\d+(?!([&]))/, n => `<a href="${n}">${n}</a>`);
+                        article.html(filtered);
                     }
 
                     var header = jQuery('<header>');
@@ -181,11 +185,9 @@
                     {% endif %}
 
                     article.prepend(header);
-                    article.html(article.innerText().replace(/#\d+/, n => `<a href="${n}">${n}</a>`));
+                    
                     new_li.append(article);
                     $('#memories').append(new_li);
-                    });
-
                 });
             }
         }

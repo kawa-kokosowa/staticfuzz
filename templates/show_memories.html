@@ -20,7 +20,9 @@
           <img src="data:image/png;base64,{{ memory.base64_image }}" alt="{{ memory.id }}">
         </a>
         {% else %}
+        <blockquote>
         {{ memory.text | number_links | safe }}
+        </blockquote>
         {% endif %}
 
         </article>
