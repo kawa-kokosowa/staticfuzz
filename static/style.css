@@ -8,6 +8,8 @@
  *   - Magenta: #e82b7a
  *   - Green: 8fe81f
  *   - Black: #212121
+ *
+ *   Total row height is 48px
  */
 
 * {
@@ -49,17 +51,17 @@ body::after {
     z-index: 3;
 }
 
-header {
+#brand {
   color: #e82b7a;
   display: block;
   padding-top: 3rem;
 }
 
-header p {
+#brand p {
   line-height: 3rem;
 }
 
-header p + p {
+#brand p + p {
   line-height: 3rem;
   font-size: 0.75rem;
 }
@@ -76,13 +78,6 @@ h1 a:visited {
   text-decoration: none;
 }
 
-h2 {
-  color: #fff430;
-  font-size: 138.2%;
-  line-height: 1.5rem;
-  margin-top: 1.5rem;
-}
-
 #memories img {
   background: #212121;
   max-width: 100%;
@@ -96,13 +91,6 @@ h2 {
 }
 
 #memories > li:before {
-  content: attr(id);
-  color: #fff;
-  font-weight: 700;
-  display: inline-block;
-  line-height: 3rem;
-  background: url(bullet.gif) 0 0 repeat;
-  background-size: cover;
 }
 
 
@@ -116,12 +104,26 @@ h2 {
     display: inline-block;
 }
 
+#memories li header h2 {
+  color: #fff;
+  font-weight: 700;
+  display: block;
+  line-height: 3rem;
+  color: #fff430;
+}
+
+.timestamp {
+  font-size: 1rem;
+  color: #d0ddd2;
+  display: block;
+  line-height: 3rem;
+}
+
 .memory,
-header,
+#brand,
 #diamond,
 #error,
-#memories > li:before,
-footer {
+#memories li header h2 {
   animation: fuzz 0.04s infinite;
   left: 0;
 }
@@ -229,14 +231,6 @@ a + form {
     position: absolute;
     float: left;
     margin-left: -5rem;
-}
-
-footer {
-    z-index: 0;
-  display: inline-block;
-  font-size: 0.75rem;
-  line-height: 1.5rem;
-  margin: 1.5rem 0;
 }
 
 iframe {

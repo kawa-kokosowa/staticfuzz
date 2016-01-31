@@ -19,6 +19,7 @@ Options:
 """
 
 import mimetypes
+import datetime
 import random
 import json
 import os
@@ -62,10 +63,12 @@ class Memory(db.Model):
 
     __tablename__ = "memories"
     id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime,
+                          default=datetime.datetime.utcnow)
     text = db.Column(db.Unicode(140), unique=True)
     base64_image = db.Column(db.String())
 
-    def __init__(self, text, base64_image=None):
+    def __init__(self, text):
         """Create a new memory with text and optionally base64
         representation of the image content found at the URI in
         the text argument.
@@ -74,42 +77,19 @@ class Memory(db.Model):
             text (str): This is required for all memories. If this
                 is a link to an image, a base64_image thumbnail will
                 be generated for said image.
-            base64_image (str): Base 64 thumbnail for an image linked
-                in the text field. This field is used for base64 encoded
-                data URI (image src for thumbnails).
 
         """
 
         self.text = text
-        self.base64_image = None
 
-        if base64_image:
-            self.base64_image = base64_image
-        elif uri_valid_image(text):  # valid uri to image?
+        if uri_valid_image(text):  # valid uri to image?
             self.base64_image = glitch.glitch_from_url(text)
+        else:
+            self.base64_image = None
 
     def __repr__(self):
 
         return "<Memory #%d: %s>" % (self.id, self.text)
-
-    @classmethod
-    def from_dict(cls, memory_dict):
-        """Create a new memory based on a dictionary.
-
-        Args:
-            memory_dict (dict): Keys are the fields for
-                a memory. It looks like this:
-
-                >>> {'text': "foo", "base64_image": None}
-
-        Returns:
-            Memory: Created from a dictionary, for you to
-                save in a database!
-
-        """
-
-        return cls(text=memory_dict["text"],
-                   base64_image=memory_dict.get("base64_image"))
 
     def to_dict(self):
         """Return a dictionary representation of this Memory.
@@ -122,6 +102,7 @@ class Memory(db.Model):
         """
 
         return {"text": self.text,
+                "timestamp": self.timestamp,
                 "base64_image": self.base64_image,
                 "id": self.id}
 
@@ -433,6 +414,9 @@ def event():
         if memories:
             latest_memory_id = memories[-1].id
             newer_memories = [memory.to_dict() for memory in memories]
+
+            for memory in newer_memories:
+                memory["timestamp"] = memory["timestamp"].isoformat("T")
 
             yield "data: " + json.dumps(newer_memories) + "\n\n"
 
