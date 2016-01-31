@@ -158,7 +158,7 @@
                         var blockquote = jQuery('<blockquote>');
                         blockquote.text(memory.text);
                         article.append(blockquote);
-                        var filtered = article.html().replace(/#\d+(?!([&]))/, n => `<a href="${n}">${n}</a>`);
+                        var filtered = article.html().replace(/#\d+(?!([&]))/g, n => `<a href="${n}">${n}</a>`);
                         article.html(filtered);
                     }
 
