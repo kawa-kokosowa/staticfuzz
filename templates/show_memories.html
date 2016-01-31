@@ -8,6 +8,12 @@
           <header>
             <h2>#{{ memory.id }}</h2>
             <time class="timestamp">{{ memory.timestamp }}</time>
+            {% if session.deity %}
+              <form action="{{ url_for('forget') }}" method=post>
+                <input type="hidden" name="id" value={{ memory.id }}>
+                <input type="submit" value="Forget">
+              </form>
+            {% endif %}
           </header>
         {% if memory.base64_image %}
         <a href="{{ memory.text }}">
@@ -17,12 +23,6 @@
         {{ memory.text}}
         {% endif %}
 
-        {% if session.logged_in %}
-          <form action="{{ url_for('forget') }}" method=post>
-            <input type="hidden" name="id" value={{ memory.id }}>
-            <input type="submit" value="Forget">
-          </form>
-        {% endif %}
         </article>
       </li>
 	{% endfor %}

@@ -167,7 +167,7 @@
                     timestamp.text(memory.timestamp);
                     header.append(timestamp);
 
-                    {% if session.logged_in %}
+                    {% if session.deity %}
                         var deity_delete_form = jQuery("<form />");
                         deity_delete_form.attr("action", "{{ url_for("forget") }}");
                         deity_delete_form.attr("method", "post");

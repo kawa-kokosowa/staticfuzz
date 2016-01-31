@@ -210,14 +210,17 @@ ol li form {
 
 ol li form input[value=Forget] {
   /* forget */
-  font: 400 0.75rem/1.5rem 'Averia Sans Libre';
+  font: 400 1.5rem/1.5rem 'Averia Sans Libre';
+  float: right;
   border: none;
   padding: 0 10px;
   font-weight: bold;
   z-index: 0;
   width: 100%;
-  background: #8fe81f;
   cursor: crosshair;
+  background: transparent;
+  color: #8fe81f;
+  text-decoration: underline;
 }
 
 ol li a {
