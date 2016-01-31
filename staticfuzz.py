@@ -23,11 +23,13 @@ import datetime
 import random
 import json
 import os
+import re
 
 import flask
 import docopt
 import gevent
 import requests
+import markupsafe
 from flask_limiter import Limiter
 from flask_sqlalchemy import SQLAlchemy
 from gevent.pywsgi import WSGIServer
@@ -318,6 +320,16 @@ class SlashDanbooru(SlashCommand):
             # There were no results!
             return SlashCommandResponse(False,
                                         (app.config["ERROR_DANBOORU"], 400))
+
+
+@app.template_filter('number_links')
+def number_links(string_being_filtered):
+    string_being_filtered = str(markupsafe.escape(string_being_filtered))
+    pattern = re.compile("(#\d+)")
+    string_being_filtered = pattern.subn(r'<a href="\1">\1</a>',
+                                         string_being_filtered)[0]
+
+    return string_being_filtered
 
 
 def uri_valid_image(uri):

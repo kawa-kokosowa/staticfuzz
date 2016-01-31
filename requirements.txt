@@ -7,4 +7,5 @@ docopt
 flask_sqlalchemy
 flask_limiter
 pytest-flask
+markupsafe
 pydub

@@ -244,7 +244,11 @@ ol li form input[value=Forget] {
 }
 
 ol li a {
-  display: block;
+}
+
+#memories li:target {
+  background: url('bg-ditherbars.gif') 0 0 repeat;
+  background-size: cover;
 }
 
 iframe {
