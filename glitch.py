@@ -47,6 +47,10 @@ def atkinson_dither(pil_image):
 
 
 def glitch_from_url(url_string):
+    """This is the thumbnail generating function.
+
+    """
+
     # get the image from the net
     headers = {'User-Agent': 'Mozilla/5.0'}
     req = urllib2.Request(url_string, None, headers)
