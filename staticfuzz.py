@@ -324,12 +324,13 @@ class SlashDanbooru(SlashCommand):
 
 @app.template_filter('number_links')
 def number_links(string_being_filtered):
-    string_being_filtered = str(markupsafe.escape(string_being_filtered))
+    escaped_string = markupsafe.escape(string_being_filtered)
+    unicode_escaped_string = markupsafe.soft_unicode(escaped_string)
     pattern = re.compile("(?<!&)(#\d+)")
-    string_being_filtered = pattern.subn(r'<a href="\1">\1</a>',
-                                         string_being_filtered)[0]
+    final_string = pattern.subn(r'<a href="\1">\1</a>',
+                                unicode_escaped_string)[0]
 
-    return string_being_filtered
+    return final_string
 
 
 def uri_valid_image(uri):
