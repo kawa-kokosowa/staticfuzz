@@ -25,7 +25,7 @@ body {
               url('/random_image');
   background-color: #000;
   background-size: cover;
-  background-position: center top;
+  background-position: center center;
   background-attachment: fixed;
   word-break: break-all;
   font: 400 32px/1.5rem 'Averia Sans Libre';  /* total row height is 48px */
