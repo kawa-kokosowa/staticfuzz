@@ -329,7 +329,7 @@ class SlashDanbooru(SlashCommand):
 @app.template_filter('number_links')
 def number_links(string_being_filtered):
     escaped_string = markupsafe.escape(string_being_filtered)
-    unicode_escaped_string = markupsafe.soft_unicode(escaped_string)
+    unicode_escaped_string = unicode(escaped_string)
     pattern = re.compile("(?<!&)(#\d+)")
     final_string = pattern.subn(r'<a href="\1">\1</a>',
                                 unicode_escaped_string)[0]
