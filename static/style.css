@@ -247,8 +247,8 @@ ol li a {
 }
 
 #memories li:target {
-  background: url('bg-ditherbars.gif') 0 0 repeat;
-  background-size: cover;
+  background: linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ),
+              url('bg-ditherbars.gif') 0 0 repeat;
 }
 
 iframe {

@@ -181,8 +181,10 @@
                     {% endif %}
 
                     article.prepend(header);
+                    article.html(article.innerText().replace(/#\d+/, n => `<a href="${n}">${n}</a>`));
                     new_li.append(article);
                     $('#memories').append(new_li);
+                    });
 
                 });
             }
