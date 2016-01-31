@@ -96,6 +96,8 @@ class Memory(db.Model):
     def to_dict(self):
         """Return a dictionary representation of this Memory.
 
+        This is for sending as an event.
+
         Returns:
             dict: Looks something like this:
 
@@ -103,8 +105,10 @@ class Memory(db.Model):
 
         """
 
+        timestamp = self.timestamp.isoformat("T") + 'Z'
+
         return {"text": self.text,
-                "timestamp": self.timestamp,
+                "timestamp": timestamp,
                 "base64_image": self.base64_image,
                 "id": self.id}
 
@@ -427,9 +431,6 @@ def event():
         if memories:
             latest_memory_id = memories[-1].id
             newer_memories = [memory.to_dict() for memory in memories]
-
-            for memory in newer_memories:
-                memory["timestamp"] = memory["timestamp"].isoformat("T")
 
             yield "data: " + json.dumps(newer_memories) + "\n\n"
 
