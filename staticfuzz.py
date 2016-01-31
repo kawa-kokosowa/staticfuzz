@@ -325,7 +325,7 @@ class SlashDanbooru(SlashCommand):
 @app.template_filter('number_links')
 def number_links(string_being_filtered):
     string_being_filtered = str(markupsafe.escape(string_being_filtered))
-    pattern = re.compile("(#\d+(?!([&])))")
+    pattern = re.compile("(?<!&)(#\d+)")
     string_being_filtered = pattern.subn(r'<a href="\1">\1</a>',
                                          string_being_filtered)[0]
 
