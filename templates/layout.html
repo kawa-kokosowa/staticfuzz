@@ -158,6 +158,9 @@
                     }
 
                     var header = jQuery('<header>');
+                    var memory_id = jQuery('<h2>');
+                    memory_id.text("#" + memory.id);
+                    header.append(memory_id);
 
                     var timestamp = jQuery('<time>');
                     timestamp.attr('class', 'timestamp');
