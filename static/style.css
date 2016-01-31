@@ -81,7 +81,6 @@ h1 a:visited {
 #memories img {
   background: #212121;
   max-width: 100%;
-  float: left;
 }
 
 #memories {
@@ -159,22 +158,32 @@ li:nth-child(4) {
 }
 
 li:nth-child(5) {
+  -webkit-filter: grayscale(50%);
+  filter: grayscale(50%);
   opacity: 0.50;
 }
 
 li:nth-child(6) {
+  -webkit-filter: grayscale(40%);
+  filter: grayscale(40%);
   opacity: 0.60;
 }
 
 li:nth-child(7) {
+  -webkit-filter: grayscale(30%);
+  filter: grayscale(30%);
   opacity: 0.70;
 }
 
 li:nth-child(8) {
+  -webkit-filter: grayscale(20%);
+  filter: grayscale(20%);
   opacity: 0.80;
 }
 
 li:nth-child(9) {
+  -webkit-filter: grayscale(10%);
+  filter: grayscale(10%);
   opacity: 0.90;
 }
 
@@ -204,36 +213,38 @@ input[type=text]:focus {
   filter: none;
 }
 
-ol li form {
-  display: inline-block;
-}
-
 ol li form input[value=Forget] {
   /* forget */
-  font: 400 1.5rem/1.5rem 'Averia Sans Libre';
-  float: right;
+  font: 400 1.5rem/5rem 'Averia Sans Libre';
   border: none;
-  padding: 0 10px;
-  font-weight: bold;
-  z-index: 0;
-  width: 100%;
+  z-index: 1;
   cursor: crosshair;
   background: transparent;
-  color: #8fe81f;
+  color: #000;
   text-decoration: underline;
+}
+
+#memories li form {
+  float: right;
+  transform: rotate(-45deg);
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  margin-left: -2.5rem;
+  margin-top: -2.5rem;
+  z-index: 0;
+  opacity: 0.4;
+  background: #8fe81f;
+  border-radius: 50%;
+  text-align: center;
+}
+
+#memories li form:hover {
+  z-index: 1;
 }
 
 ol li a {
   display: block;
-  float: left;
-}
-
-a + form {
-    width: 6rem;
-    transform: rotate(45deg);
-    position: absolute;
-    float: left;
-    margin-left: -5rem;
 }
 
 iframe {
@@ -250,7 +261,7 @@ iframe {
   color: #e82b7a;
   position: fixed;
   padding-top: 3rem;
-    background: url('error.gif') no-repeat center center fixed #ff0000;
+  background: url('error.gif') no-repeat center center fixed #ff0000;
     background-size: cover;
     z-index: 10;
     top: 0;
