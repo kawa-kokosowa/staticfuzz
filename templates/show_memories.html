@@ -16,7 +16,7 @@
             {% endif %}
           </header>
         {% if memory.base64_image %}
-        <a href="{{ memory.text }}">
+        <a href="{{ memory.text }}" target="_blank">
           <img src="data:image/png;base64,{{ memory.base64_image }}" alt="{{ memory.id }}">
         </a>
         {% else %}

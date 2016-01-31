@@ -146,6 +146,7 @@
                     // an image memory.
                     if (memory.base64_image) {
                         var link = jQuery('<a />');
+                        link.attr('target', '_blank');
                         link.attr('href', memory.text);
 
                         var image = jQuery('<img />');
