@@ -550,8 +550,8 @@ def new_memory():
 
     # If there are ten memories already, delete the oldest
     # to make room!
-    memories_to_delete = (Memory.query.order_by(Memory.id.asc())
-                          .offset(10))
+    memories_to_delete = (Memory.query.order_by(Memory.id.desc()).
+                          offset(10))
 
     if memories_to_delete:
 
