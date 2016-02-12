@@ -550,9 +550,13 @@ def new_memory():
 
     # If there are ten memories already, delete the oldest
     # to make room!
-    if Memory.query.count() == 10:
-        memory_to_delete = Memory.query.order_by(Memory.id.asc()).first()
-        db.session.delete(memory_to_delete)
+    memories_to_delete = (Memory.query.order_by(Memory.id.asc())
+                          .offset(10))
+
+    if memories_to_delete:
+
+        for memory in memories_to_delete:
+            db.session.delete(memory)
 
     new_memory = Memory(text=memory_text)
     db.session.add(new_memory)
