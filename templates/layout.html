@@ -1,199 +1,198 @@
 <!DOCTYPE html>
 <html>
-  <head>
-      <title>S T A T I C F U Z Z</title>
-      <meta charset="UTF-8">
-      <meta name=viewport content="width=device-width, initial-scale=1">
-      <link href='https://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700,700italic,400italic' rel='stylesheet' type='text/css'>
-      <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-      <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-      <!--<link rel="stylesheet" href="http://basehold.it/48/ff0000">-->
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    </head>
-    <body>
-      <header id="brand">
-        <h1><a href="/">STATICFUZZ</a></h1>
-        <p>Memories which vanish. Live 10 post message board.</p>
-        <p><a href="https://github.com/hypatia-software-org/staticfuzz">
-        GitHub repository</a>; software by
-        <a href="http://hypatia.software">Hypatia Software Organization</a>.</p>
+<head>
+  <title>S T A T I C F U Z Z</title>
+  <meta charset="UTF-8">
+  <meta name=viewport content="width=device-width, initial-scale=1">
+  <link href='https://fonts.googleapis.com/css?family=Averia+Sans+Libre:400,700,700italic,400italic'
+        rel='stylesheet' type='text/css'>
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+</head>
+<body>
+  <header id="brand">
+    <h1><a href="/">STATICFUZZ</a></h1>
+    <p>Memories which vanish. Live 10 post message board.</p>
+    <p><a href="https://github.com/hypatia-software-org/staticfuzz">
+    GitHub repository</a>; software by
+    <a href="http://hypatia.software">Hypatia Software Organization</a>.</p>
 
-        {% if config.BACKGROUND_MP3 %}
-          <audio controls>
-            <source src="{{ config.BACKGROUND_MP3 }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-        {% endif %}
-     
-      </header>
-      <main>
-	    {% block body %}{% endblock %}
-      </main>
-      <!-- <script src="/sse.js"></script> -->
-      <script>
-        {% if config.NOTIFICATION_SOUND %}
-            var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
-            var error_sound = new Audio('{{ config.ERROR_SOUND}}');
-        {% endif %} 
+    {% if config.BACKGROUND_MP3 %}
+      <audio controls>
+        <source src="{{ config.BACKGROUND_MP3 }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    {% endif %}
+ 
+  </header>
+  <main>
+  {% block body %}{% endblock %}
+  </main>
+  <script>
+    {% if config.NOTIFICATION_SOUND %}
+        var notification_sound = new Audio('{{ config.NOTIFICATION_SOUND}}');
+        var error_sound = new Audio('{{ config.ERROR_SOUND}}');
+    {% endif %} 
 
-        // notification system
-        var Notification = window.Notification || window.mozNotification || window.webkitNotification;
+    // notification system
+    var Notification = window.Notification || window.mozNotification || window.webkitNotification;
 
-        Notification.requestPermission(function (permission) {
-            // .. get permission for showing notifications
-            // console.log(permission);
+    Notification.requestPermission(function (permission) {
+        // .. get permission for showing notifications
+        // console.log(permission);
+    });
+
+    function changeBackground() {
+        // change background
+        var randomId = new Date().getTime();
+        $("body").css("background-image", "linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('/random_image?random=" + randomId + "')");
+    }
+
+    function showNotification(memory) {
+        // display a notification for a new memory
+        var instance = new Notification("Staticfuzz Memory #" + memory.id, {
+            body: memory.text,
+            icon: "http://staticfuzz.com/static/bg-wave.gif",
+        });
+        instance.silent
+
+        instance.onclick = function () {
+            window.focus();
+            var top = document.getElementById(memory.id).offsetTop
+            window.scrollTo(0, top);
+            this.close();
+        };
+        instance.onerror = function () {
+            // Something to do
+        };
+        instance.onshow = function () {
+            // Something to do
+        };
+        instance.onclose = function () {
+            // Something to do
+        };
+
+        return false;
+    }
+
+    // replace chat submit with ajax send
+    $('#diamond').removeAttr("method");
+    $('#diamond').removeAttr("action");
+    $("#diamond").on("submit", function (e) {
+        e.preventDefault();
+        // Send the data using post
+        $.ajax({
+            type: "POST",
+            url: "{{ url_for('new_memory') }}",
+            data: {"text": $("#diamond input").val()},
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                $("#diamond label").remove();
+                var error_message = jQuery('<label id=error for=text />');
+                error_message.text(XMLHttpRequest.responseText);
+                $("#diamond").append(error_message);
+                {% if config.NOTIFICATION_SOUND %}
+                error_sound.play();
+                {% endif %} 
+
+            }
         });
 
-        function changeBackground() {
-            // change background
-            var randomId = new Date().getTime();
-            $("body").css("background-image", "linear-gradient( rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.80) ), url('/random_image?random=" + randomId + "')");
+        // reset input
+        $("#diamond input").val('');
+    });
+
+    /* Listen on event source. */
+
+    function listen() {
+        var source = new EventSource("/stream/");
+        source.onerror = function(eventdata) {
+            // i feel like this should do something major...
+            this.close();
+            listen();
         }
+        source.onmessage = function(eventdata) {
+            console.log(eventdata);
+            var memories = JSON.parse(eventdata["data"]);
+            changeBackground();
 
-        function showNotification(memory) {
-            // display a notification for a new memory
-            var instance = new Notification("Staticfuzz Memory #" + memory.id, {
-                body: memory.text,
-                icon: "http://staticfuzz.com/static/bg-wave.gif",
-            });
-            instance.silent
-
-            instance.onclick = function () {
-                window.focus();
-                var top = document.getElementById(memory.id).offsetTop
-                window.scrollTo(0, top);
-                this.close();
-            };
-            instance.onerror = function () {
-                // Something to do
-            };
-            instance.onshow = function () {
-                // Something to do
-            };
-            instance.onclose = function () {
-                // Something to do
-            };
-
-            return false;
-        }
-
-        // replace chat submit with ajax send
-        $('#diamond').removeAttr("method");
-        $('#diamond').removeAttr("action");
-        $("#diamond").on("submit", function (e) {
-            e.preventDefault();
-            // Send the data using post
-            $.ajax({
-                type: "POST",
-                url: "{{ url_for('new_memory') }}",
-                data: {"text": $("#diamond input").val()},
-                error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    $("#diamond label").remove();
-                    var error_message = jQuery('<label id=error for=text />');
-                    error_message.text(XMLHttpRequest.responseText);
-                    $("#diamond").append(error_message);
-                    {% if config.NOTIFICATION_SOUND %}
-                    error_sound.play();
-                    {% endif %} 
-
+            $.each(memories, function(index, memory) {
+                // If there are already ten memories in the HTML,
+                // remove the first <li> before we add another!
+                if ($("#memories li").length == 10) {
+                    $("#memories li:first-child").remove();
                 }
+
+                // Notification: pop up message if page isn't focused, optional sound
+
+
+                // only popup if the tab doesn't have focus
+                if (! document.hasFocus()) {
+                    {% if config.NOTIFICATION_SOUND %}
+                    notification_sound.play();
+                    {% endif %} 
+                    showNotification(memory);
+                }
+
+                var new_li = jQuery('<li>');
+                new_li.attr('id', memory.id);
+
+                var article = jQuery('<article>');
+                article.attr('class', 'memory');
+
+                // If there's a base64 representation of the
+                // url found in memory.text, let's make this
+                // an image memory.
+                if (memory.base64_image) {
+                    var link = jQuery('<a />');
+                    link.attr('target', '_blank');
+                    link.attr('href', memory.text);
+
+                    var image = jQuery('<img />');
+                    image.attr('src', "data:image/png;base64," + memory.base64_image);
+
+                    link.append(image);
+                    article.append(link);
+                } else {  // regular memory
+                    var blockquote = jQuery('<blockquote>');
+                    blockquote.text(memory.text);
+                    article.append(blockquote);
+                    var filtered = article.html().replace(/#\d+(?!([&]))/g, n => `<a href="${n}">${n}</a>`);
+                    article.html(filtered);
+                }
+
+                var header = jQuery('<header>');
+                var memory_id = jQuery('<h2>');
+                memory_id.text("#" + memory.id);
+                header.append(memory_id);
+
+                var timestamp = jQuery('<time>');
+                timestamp.attr('class', 'timestamp');
+                timestamp.text(memory.timestamp);
+                header.append(timestamp);
+
+                {% if session.deity %}
+                    var deity_delete_form = jQuery("<form />");
+                    deity_delete_form.attr("action", "{{ url_for("forget") }}");
+                    deity_delete_form.attr("method", "post");
+
+                    var hidden_id = jQuery("<input />");
+                    deity_delete_form.attr("type", "hidden");
+                    deity_delete_form.attr("value", "");
+                    deity_delete_form.append('<input type="hidden" name="id" value='+memory.id+'>');
+                    deity_delete_form.append('<input type="submit" value="Forget">');
+                    header.append(deity_delete_form);
+                {% endif %}
+
+                article.prepend(header);
+                
+                new_li.append(article);
+                $('#memories').append(new_li);
             });
-
-            // reset input
-            $("#diamond input").val('');
-        });
-
-        /* Listen on event source. */
-
-        function listen() {
-            var source = new EventSource("/stream/");
-            source.onerror = function(eventdata) {
-                // i feel like this should do something major...
-                this.close();
-                listen();
-            }
-            source.onmessage = function(eventdata) {
-                console.log(eventdata);
-                var memories = JSON.parse(eventdata["data"]);
-                changeBackground();
-
-                $.each(memories, function(index, memory) {
-                    // If there are already ten memories in the HTML,
-                    // remove the first <li> before we add another!
-                    if ($("#memories li").length == 10) {
-                        $("#memories li:first-child").remove();
-                    }
-
-                    // Notification: pop up message if page isn't focused, optional sound
-
-
-                    // only popup if the tab doesn't have focus
-                    if (! document.hasFocus()) {
-                        {% if config.NOTIFICATION_SOUND %}
-                        notification_sound.play();
-                        {% endif %} 
-                        showNotification(memory);
-                    }
-
-                    var new_li = jQuery('<li>');
-                    new_li.attr('id', memory.id);
-
-                    var article = jQuery('<article>');
-                    article.attr('class', 'memory');
-
-                    // If there's a base64 representation of the
-                    // url found in memory.text, let's make this
-                    // an image memory.
-                    if (memory.base64_image) {
-                        var link = jQuery('<a />');
-                        link.attr('target', '_blank');
-                        link.attr('href', memory.text);
-
-                        var image = jQuery('<img />');
-                        image.attr('src', "data:image/png;base64," + memory.base64_image);
-
-                        link.append(image);
-                        article.append(link);
-                    } else {  // regular memory
-                        var blockquote = jQuery('<blockquote>');
-                        blockquote.text(memory.text);
-                        article.append(blockquote);
-                        var filtered = article.html().replace(/#\d+(?!([&]))/g, n => `<a href="${n}">${n}</a>`);
-                        article.html(filtered);
-                    }
-
-                    var header = jQuery('<header>');
-                    var memory_id = jQuery('<h2>');
-                    memory_id.text("#" + memory.id);
-                    header.append(memory_id);
-
-                    var timestamp = jQuery('<time>');
-                    timestamp.attr('class', 'timestamp');
-                    timestamp.text(memory.timestamp);
-                    header.append(timestamp);
-
-                    {% if session.deity %}
-                        var deity_delete_form = jQuery("<form />");
-                        deity_delete_form.attr("action", "{{ url_for("forget") }}");
-                        deity_delete_form.attr("method", "post");
-
-                        var hidden_id = jQuery("<input />");
-                        deity_delete_form.attr("type", "hidden");
-                        deity_delete_form.attr("value", "");
-                        deity_delete_form.append('<input type="hidden" name="id" value='+memory.id+'>');
-                        deity_delete_form.append('<input type="submit" value="Forget">');
-                        header.append(deity_delete_form);
-                    {% endif %}
-
-                    article.prepend(header);
-                    
-                    new_li.append(article);
-                    $('#memories').append(new_li);
-                });
-            }
         }
+    }
 
-        listen();
-      </script>
-    </body>
+    listen();
+  </script>
+</body>
 </html>

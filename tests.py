@@ -14,6 +14,6 @@ def test_index_route(client):
 
 
 def test_new_memory(client):
-    resp = client.post('/new_memory', data={'text': u'/danbooru goo_girl'},
+    resp = client.post('/new_memory', data={'text': '/danbooru goo_girl'},
                        follow_redirects=True)
     assert resp.status_code == 200

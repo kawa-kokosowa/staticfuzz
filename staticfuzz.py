@@ -21,6 +21,7 @@ Options:
 import mimetypes
 import datetime
 import random
+import urllib
 import json
 import os
 import re
@@ -308,7 +309,7 @@ class SlashDanbooru(SlashCommand):
 
         """
 
-        tags = "%20".join(args)
+        tags = urllib.quote_plus(' '.join(args))
         endpoint = ('http://danbooru.donmai.us/posts.json?'
                     'tags=%s&limit=10&page1' % tags)
         results = requests.get(endpoint).json()
@@ -350,6 +351,10 @@ def uri_valid_image(uri):
 
     image_extension_whitelist = (".jpg", ".jpeg", ".png", ".gif")
 
+    if not uri.lower().endswith(image_extension_whitelist):
+
+        return False
+
     # actually fetch the resource to see if it's real or not
     try:
         request = requests.get(uri)
@@ -362,7 +367,7 @@ def uri_valid_image(uri):
 
         return False
 
-    return uri.lower().endswith(image_extension_whitelist)
+    return True
 
 
 @app.errorhandler(429)
