@@ -9,6 +9,8 @@ Memories which vanish. Live message board, in the spirit of
 early anonymous message boards, like http://www.2ch.net/ and
 [Kareha](https://wakaba.c3.cx/s/web/wakaba_kareha).
 
+Someone's working on [a port of Staticfuzz for Google App Engine](https://github.com/brechin/staticfuzz).
+
 ## Why use?
 
   * Memories only ever exist in memory (RAM)

@@ -119,7 +119,6 @@
             $.each(memories, function(index, memory) {
                 // If there are already ten memories in the HTML,
                 // remove the first <li> before we add another!
-                console.log($("#memories").children().length);
                 if ($("#memories").children().length == 10) {
                     $("#memories li:first-child").remove();
                 }
