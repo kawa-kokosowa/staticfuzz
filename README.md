@@ -84,6 +84,4 @@ Try posting a link to an image!
 
 ## Built with love
 
-Free for commercial or any purpose (MIT license).
-
-Crafted by [Hypatia Software Organization](http://hypatia.software/).
+Free for commercial or any purpose (MIT license) by Lily Seabreeze.
