@@ -22,55 +22,105 @@ import mimetypes
 import datetime
 import random
 import urllib
+import time
 import json
 import os
 import re
 
 import flask
 import docopt
-import gevent
 import requests
 import markupsafe
+from flask_sse import sse
 from flask_limiter import Limiter
-from flask_sqlalchemy import SQLAlchemy
-from gevent.pywsgi import WSGIServer
-from gevent import monkey
+from celery import Celery
 
 import glitch
 
 
-monkey.patch_all()  # NOTE: totally cargo culting this one
-
 # Create and init the staticfuzz
 app = flask.Flask(__name__)
 app.config.from_object("config")
+app.config["REDIS_URL"] = "redis://localhost"
+app.register_blueprint(sse, url_prefix='/stream')
 limiter = Limiter(app)
+celery = Celery(
+    'staticfuzz',
+    broker='redis://localhost',
+    backend='redis://localhost',
+)
 
-db = SQLAlchemy(app)
+
+memories_counter = 0
+"""The total number of memories having been created since launch."""
+
+memories = []
+"""The memories list structure stores ten memories in memory like this:
+
+[
+    (
+        numberth memory created since staticfuzz launched (int),
+        timestamp/unix epoch (int),
+        memory text (str),
+        base64 image (str|None),
+    ),
+]
+
+Note that if "base64 image" isn't None, then "memory text" is a URI
+pointing to image.
+
+numberth memory created since... is set/determined by the memories_counter...
+
+"""
 
 
-class Memory(db.Model):
-    """SQLAlchemy/database abstraction of a memory.
+@celery.task
+def memory_structure_list_pop_oldest():
+    """At position 0 of our ten item list."""
 
-    Memories are aptly kept in the "memories" table.
+    # we don't subtract from counter cuz...
+    global memories
 
-    Fields/attributes:
-        id (int): Unique identifier, never resets.
-        text (str): String, the text of the memory, the
-            memory itself.
-        base64_image str): if `text` is a URI to an image,
-            then this is the base64 encoding of said
-            image. Used as thumbnail.
+    if len(memories) >= 10:
+        return memories.pop(0)
+
+
+@celery.task
+def memory_structure_list_append(memory_structure):
+    global memories
+    global memories_counter
+    memories.append(memory_structure)
+    memories_counter += 1
+    return True
+
+
+def memory_to_dict(memory_structure):
+    """Take a memory structure and make a dictionary.
+
+    Arguments:
+        memory_structure (tuple): Related to the memories
+            module-level variable, which contains all ten
+            of the memories in... memory. To see what
+            this argument should look like, please see
+            the memories module level attribute's docstring.
+
+    Returns:
+        dict: Looks something like this:
+
+            >>> {'text': "foo", "base64_image": None}
 
     """
 
-    __tablename__ = "memories"
-    id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime,
-                          default=datetime.datetime.utcnow)
-    text = db.Column(db.Unicode(140), unique=True)
-    base64_image = db.Column(db.String())
+    timestamp = datetime.datetime.fromtimestamp(memory_structure[1]).isoformat()
+    return {
+        'id': memory_structure[0],
+        'timestamp': timestamp,
+        'text': memory_structure[2],
+        'base64_image': memory_structure[3],
+    }
 
+
+    # FIXME: this is for create...
     def __init__(self, text):
         """Create a new memory with text and optionally base64
         representation of the image content found at the URI in
@@ -84,34 +134,6 @@ class Memory(db.Model):
         """
 
         self.text = text
-
-        if uri_valid_image(text):  # valid uri to image?
-            self.base64_image = glitch.glitch_from_url(text)
-        else:
-            self.base64_image = None
-
-    def __repr__(self):
-
-        return "<Memory #%d: %s>" % (self.id, self.text)
-
-    def to_dict(self):
-        """Return a dictionary representation of this Memory.
-
-        This is for sending as an event.
-
-        Returns:
-            dict: Looks something like this:
-
-                >>> {'text': "foo", "base64_image": None}
-
-        """
-
-        timestamp = self.timestamp.isoformat("T") + 'Z'
-
-        return {"text": self.text,
-                "timestamp": timestamp,
-                "base64_image": self.base64_image,
-                "id": self.id}
 
 
 class SlashCommandResponse(object):
@@ -399,62 +421,18 @@ def init_db():
 
     """
 
-    db.drop_all()
-    db.create_all()
-
-    test_memory = Memory(text=app.config["FIRST_MESSAGE"])
-    db.session.add(test_memory)
-    db.session.commit()
-
-
-def event():
-    """EventSource stream; server side events. Used for
-    sending out new memories.
-
-    Returns:
-        json event (str): --
-
-    See Also:
-        stream()
-
-    """
-
-    with app.app_context():
-
-        try:
-            latest_memory_id = Memory.query.order_by(Memory.id.desc()).first().id
-        except AttributeError:
-            # .id will raise AttributeError if the query doesn't match anything
-            latest_memory_id = 0
-
-    while True:
-
-        with app.app_context():
-            memories = (Memory.query.filter(Memory.id > latest_memory_id).
-                        order_by(Memory.id.asc()).all())
-
-        if memories:
-            latest_memory_id = memories[-1].id
-            newer_memories = [memory.to_dict() for memory in memories]
-
-            yield "data: " + json.dumps(newer_memories) + "\n\n"
-
-        with app.app_context():
-            gevent.sleep(app.config['SLEEP_RATE'])
-
-
-@app.route('/stream/', methods=['GET', 'POST'])
-@limiter.limit("15/minute")
-def stream():
-    """SSE (Server Side Events), for an EventSource. Send
-    the event of a new message.
-
-    See Also:
-        event()
-
-    """
-
-    return flask.Response(event(), mimetype="text/event-stream")
+    # FIXME
+    memory_text = "lol this should be config"
+    memory_structure = (
+        memories_counter,
+        int(time.time()),
+        memory_text,
+        # uri valid image can be better, just see urlink... should
+        # make that a sep package... also y not using b64 pkg i made?!
+        # FIXME
+        glitch.glitch_from_url(memory_text) if uri_valid_image(memory_text) else None,
+    )
+    memory_structure_list_append(memory_structure)
 
 
 @app.route('/')
@@ -464,11 +442,22 @@ def show_memories():
 
     """
 
-    memories = Memory.query.order_by(Memory.id.asc()).all()
-    memories_for_jinja = [memory.to_dict() for memory in memories]
+    # i don't believe this is necessary now?
+    memories_sorted = sorted(memories, key=lambda x: x[0])
+    memories_for_jinja = [memory_to_dict(memory) for memory in memories_sorted]
 
     return flask.render_template('show_memories.html',
                                  memories=memories_for_jinja)
+
+
+@celery.task
+# you cannot repost something already in the memories
+def original(text):
+    global memories
+
+    for memory in memories:
+        if memory[3] == text:
+            return app.config["ERROR_UNORIGINAL"], 400
 
 
 def validate(memory_text):
@@ -488,12 +477,8 @@ def validate(memory_text):
         return app.config["ERROR_TOO_LONG"], 400
 
     # you cannot repost something already in the memories
-    if Memory.query.filter_by(text=memory_text).all():
-
-        return app.config["ERROR_UNORIGINAL"], 400
-
     # success!
-    return None
+    return original(memory_text)
 
 
 @app.route('/new_memory', methods=['POST'])
@@ -553,21 +538,35 @@ def new_memory():
 
         return "Invalid Slash Command", 400
 
+    # XXX: may wanna look at this again... refactored!
+    # what if use slots based approach? replace oldest...
     # If there are ten memories already, delete the oldest
     # to make room!
-    memories_to_delete = (Memory.query.order_by(Memory.id.desc()).
-                          offset(9))
+    memory_structure_list_pop_oldest()
+    if len(memories) >= 10:
+        del memories[0]
 
-    if memories_to_delete:
-
-        for memory in memories_to_delete:
-            db.session.delete(memory)
-
-    new_memory = Memory(text=memory_text)
-    db.session.add(new_memory)
-    db.session.commit()
+    # XXX: make this function?
+    memory_structure = (
+        (
+            memories_counter,
+            int(time.time()),
+            memory_text,
+            # uri valid image can be better, just see urlink... should
+            # make that a sep package... also y not using b64 pkg i made?!
+            # FIXME
+            glitch.glitch_from_url(memory_text) if uri_valid_image(memory_text) else None,
+        )
+    )
+    memory_structure_list_append(memory_structure)
+    sse.publish(memory_to_dict(memory_structure), type='greeting')  # XXX
 
     return flask.redirect(flask.url_for('show_memories'))
+
+
+
+
+
 
 
 @app.route('/forget', methods=['POST'])
@@ -585,12 +584,14 @@ def forget():
     if not flask.session.get('deity'):
         flask.abort(401)
 
-    Memory.query.filter_by(id=flask.request.form["id"]).delete()
-    db.session.commit()
+    for i, memory in enumerate(memories):
+        if memory[0] == flask.request.form['id']:
+            del memories[i]
 
     return flask.redirect(flask.url_for('show_memories'))
 
 
+# FIXME: delete later?
 # NOTE: this is all the way at the bottom so we can use init_db!
 if app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:":
     # Use memory SQLITE database! Meaning the HDD is never touched!
@@ -605,4 +606,5 @@ if __name__ == '__main__':
         init_db()
 
     if arguments["serve"]:
-        WSGIServer(('', app.config["PORT"]), app).serve_forever()
+        app.run()
+        #WSGIServer(('', app.config["PORT"]), app).serve_forever()

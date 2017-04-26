@@ -1,0 +1,7 @@
+sstuff i was readig before taking break:
+
+https://github.com/underyx/flask-redis
+
+https://pypi.python.org/pypi/Flask-SSE
+
+using redis for redis-sse and storing list of messages (instead of sqlite)

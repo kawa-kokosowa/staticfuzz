@@ -105,7 +105,7 @@
     /* Listen on event source. */
 
     function listen() {
-        var source = new EventSource("/stream/");
+        var source = new EventSource("/stream");
         source.onerror = function(eventdata) {
             // i feel like this should do something major...
             this.close();
