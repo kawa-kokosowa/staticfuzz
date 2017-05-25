@@ -1,6 +1,6 @@
 # staticfuzz
 
-[![Travis](https://img.shields.io/travis/hypatia-software-org/staticfuzz.svg?style=flat-square)](https://travis-ci.org/hypatia-software-org/staticfuzz)
+[![Travis](https://img.shields.io/travis/lily-mayfield/staticfuzz.svg?style=flat-square)](https://travis-ci.org/lily-mayfield/staticfuzz)
 [![Code Climate](https://img.shields.io/codeclimate/github/hypatia-software-org/staticfuzz.svg?style=flat-square)](https://codeclimate.com/github/hypatia-software-org/staticfuzz)
 
 See it live: http://staticfuzz.com/
